@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#include "reactphysics3d/reactphysics3d.h"
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
@@ -155,7 +157,7 @@ int main() {
         pointLight.position = glm::vec3(3.0f, 4.0f, 4.0f);
         ourShader.setVec3("pointLight.position", pointLight.position);
         ourShader.setVec3("pointLight.ambient", pointLight.ambient);
-        ourShader.setVec3("pointLight.diffuse", pointLight.diffuse);
+        ourShader.setVec3("poin tLight.diffuse", pointLight.diffuse);
         ourShader.setVec3("pointLight.specular", pointLight.specular);
         ourShader.setFloat("pointLight.constant", pointLight.constant);
         ourShader.setFloat("pointLight.linear", pointLight.linear);
