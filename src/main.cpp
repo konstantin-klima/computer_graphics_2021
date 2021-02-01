@@ -112,9 +112,12 @@ int main() {
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
 
+    // rp3d physicsCommon factory
+    reactphysics3d::PhysicsCommon physicsCommon;
+
     // load models
     // -----------
-    Model ourModel("resources/objects/arena/arena.obj");
+    Model ourModel("resources/objects/arena/arena.obj", physicsCommon);
     ourModel.SetShaderTextureNamePrefix("material.");
 
     PointLight &pointLight = programState->pointLight;
@@ -128,74 +131,25 @@ int main() {
     pointLight.quadratic = 0.032f;
 
     // ReactPhysics3D HelloWorld
-    reactphysics3d::PhysicsCommon physicsCommon;
-
     reactphysics3d::PhysicsWorld *world = physicsCommon.createPhysicsWorld();
 
-    reactphysics3d::Vector3 position(0, 20, 0);
+    reactphysics3d::Vector3 position(0, 10, 0);
     reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
     reactphysics3d::Transform transform(position, orientation);
     reactphysics3d::RigidBody *body = world->createRigidBody(transform);
+    rp3d::Vector3 halfExtents(.0, 2.0, 2.0);
+    rp3d::BoxShape *boxShape = physicsCommon.createBoxShape(halfExtents);
+    body->addCollider(boxShape, rp3d::Transform::identity());
+
+    // arena
+    auto arenaTransform = rp3d::Transform::identity();
+    rp3d::RigidBody *arenaBody = world->createRigidBody(arenaTransform);
+    arenaBody->setType(rp3d::BodyType::STATIC);
+    arenaBody->addCollider(ourModel.concaveCollider->collider, arenaTransform);
+    arenaBody->enableGravity(false);
 
     const reactphysics3d::decimal timeStep = 1.0f / 60.0f;
-
-    for (int i = 0; i < 20; i++) {
-        world->update(timeStep);
-
-        auto &transform = body->getTransform();
-        auto position = transform.getPosition();
-
-        std::cout << "Body position: (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
-    }
-
-    // Add a concave collider to the arena
-    reactphysics3d::TriangleMesh *triangleMesh = physicsCommon.createTriangleMesh();
-
-    for (auto mesh : ourModel.meshes) {
-        // TODO: do this nicer
-        int vNum = mesh.vertices.size();
-        int iNum = mesh.indices.size();
-        float vertices[3 * mesh.vertices.size()];
-        float normals[3 * vNum];
-        int indices[mesh.indices.size()];
-
-
-        for (int i = 0; i < vNum; i += 3) {
-            vertices[i] = mesh.vertices[i].Position.x;
-            vertices[i + 1] = mesh.vertices[i].Position.y;
-            vertices[i + 2] = mesh.vertices[i].Position.z;
-
-            normals[i] = mesh.vertices[i].Normal.x;
-            normals[i + 1] = mesh.vertices[i].Normal.y;
-            normals[i + 2] = mesh.vertices[i].Normal.z;
-        }
-
-
-
-        for (int i = 0; i < iNum; i++) {
-            indices[i] = mesh.indices[i];
-        }
-
-        auto *triangleVertexArray = new reactphysics3d::TriangleVertexArray(
-                vNum,
-                (const void *) vertices,
-                3 * sizeof(float),
-                (const void *) normals,
-                3 * sizeof(float ),
-                mesh.numFaces,
-                (const void *) indices,
-                3 * sizeof(int),
-                reactphysics3d::TriangleVertexArray::VertexDataType::VERTEX_FLOAT_TYPE,
-                reactphysics3d::TriangleVertexArray::NormalDataType::NORMAL_FLOAT_TYPE,
-                reactphysics3d::TriangleVertexArray::IndexDataType::INDEX_INTEGER_TYPE
-        );
-
-        triangleMesh->addSubpart(triangleVertexArray);
-    }
-
-    auto concaveMesh = physicsCommon.createConcaveMeshShape(triangleMesh);
-
-    std::cout << concaveMesh->to_string() << std::endl;
+    float accumulator = 0;
 
     // draw in wireframe
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -208,6 +162,20 @@ int main() {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+
+        // Physics
+        accumulator += deltaTime;
+
+        while (accumulator >= timeStep) {
+            world->update(timeStep);
+            accumulator -= timeStep;
+        }
+
+        auto camPos = body->getTransform().getPosition();
+        programState->camera.Position.x = camPos.x;
+        programState->camera.Position.y = camPos.y;
+        programState->camera.Position.z = camPos.z;
+
 
         // input
         // -----

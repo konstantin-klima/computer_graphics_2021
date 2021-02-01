@@ -19,6 +19,10 @@
 #include <iostream>
 #include <map>
 #include <vector>
+
+#include "ConcaveCollider.h"
+#include "reactphysics3d/reactphysics3d.h"
+
 using namespace std;
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
@@ -33,11 +37,14 @@ public:
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
+    ConcaveCollider *concaveCollider;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
+    Model(string const &path, rp3d::PhysicsCommon &physicsCommon, bool gamma = false) : gammaCorrection(gamma)
     {
         loadModel(path);
+        concaveCollider = new ConcaveCollider(meshes, physicsCommon);
+
     }
 
     // draws the model, and thus all its meshes
