@@ -112,9 +112,12 @@ int main() {
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
 
+    // rp3d physicsCommon factory
+    reactphysics3d::PhysicsCommon physicsCommon;
+
     // load models
     // -----------
-    Model ourModel("resources/objects/arena/arena.obj");
+    Model ourModel("resources/objects/arena/arena.obj", physicsCommon);
     ourModel.SetShaderTextureNamePrefix("material.");
 
     PointLight &pointLight = programState->pointLight;
@@ -128,8 +131,6 @@ int main() {
     pointLight.quadratic = 0.032f;
 
     // ReactPhysics3D HelloWorld
-    reactphysics3d::PhysicsCommon physicsCommon;
-
     reactphysics3d::PhysicsWorld *world = physicsCommon.createPhysicsWorld();
 
     reactphysics3d::Vector3 position(0, 20, 0);
