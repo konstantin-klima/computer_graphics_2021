@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#include "reactphysics3d/reactphysics3d.h"
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
@@ -52,13 +54,12 @@ struct ProgramState {
     glm::vec3 backpackPosition = glm::vec3(0.0f);
     float backpackScale = 1.0f;
     PointLight pointLight;
+
     ProgramState()
             : camera(glm::vec3(0.0f, 0.0f, 3.0f)) {}
 
 
 };
-
-
 
 
 ProgramState *programState;
@@ -116,7 +117,7 @@ int main() {
     Model ourModel("resources/objects/arena/arena.obj");
     ourModel.SetShaderTextureNamePrefix("material.");
 
-    PointLight& pointLight = programState->pointLight;
+    PointLight &pointLight = programState->pointLight;
     pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
     pointLight.ambient = glm::vec3(5, 5, 5);
     pointLight.diffuse = glm::vec3(0.9, 0.9, 0.9);
@@ -126,7 +127,75 @@ int main() {
     pointLight.linear = 0.09f;
     pointLight.quadratic = 0.032f;
 
+    // ReactPhysics3D HelloWorld
+    reactphysics3d::PhysicsCommon physicsCommon;
 
+    reactphysics3d::PhysicsWorld *world = physicsCommon.createPhysicsWorld();
+
+    reactphysics3d::Vector3 position(0, 20, 0);
+    reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
+    reactphysics3d::Transform transform(position, orientation);
+    reactphysics3d::RigidBody *body = world->createRigidBody(transform);
+
+    const reactphysics3d::decimal timeStep = 1.0f / 60.0f;
+
+    for (int i = 0; i < 20; i++) {
+        world->update(timeStep);
+
+        auto &transform = body->getTransform();
+        auto position = transform.getPosition();
+
+        std::cout << "Body position: (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
+    }
+
+    // Add a concave collider to the arena
+    reactphysics3d::TriangleMesh *triangleMesh = physicsCommon.createTriangleMesh();
+
+    for (auto mesh : ourModel.meshes) {
+        // TODO: do this nicer
+        int vNum = mesh.vertices.size();
+        int iNum = mesh.indices.size();
+        float vertices[3 * mesh.vertices.size()];
+        float normals[3 * vNum];
+        int indices[mesh.indices.size()];
+
+
+        for (int i = 0; i < vNum; i += 3) {
+            vertices[i] = mesh.vertices[i].Position.x;
+            vertices[i + 1] = mesh.vertices[i].Position.y;
+            vertices[i + 2] = mesh.vertices[i].Position.z;
+
+            normals[i] = mesh.vertices[i].Normal.x;
+            normals[i + 1] = mesh.vertices[i].Normal.y;
+            normals[i + 2] = mesh.vertices[i].Normal.z;
+        }
+
+
+
+        for (int i = 0; i < iNum; i++) {
+            indices[i] = mesh.indices[i];
+        }
+
+        auto *triangleVertexArray = new reactphysics3d::TriangleVertexArray(
+                vNum,
+                (const void *) vertices,
+                3 * sizeof(float),
+                (const void *) normals,
+                3 * sizeof(float ),
+                mesh.numFaces,
+                (const void *) indices,
+                3 * sizeof(int),
+                reactphysics3d::TriangleVertexArray::VertexDataType::VERTEX_FLOAT_TYPE,
+                reactphysics3d::TriangleVertexArray::NormalDataType::NORMAL_FLOAT_TYPE,
+                reactphysics3d::TriangleVertexArray::IndexDataType::INDEX_INTEGER_TYPE
+        );
+
+        triangleMesh->addSubpart(triangleVertexArray);
+    }
+
+    auto concaveMesh = physicsCommon.createConcaveMeshShape(triangleMesh);
+
+    std::cout << concaveMesh->to_string() << std::endl;
 
     // draw in wireframe
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -155,7 +224,7 @@ int main() {
         pointLight.position = glm::vec3(3.0f, 4.0f, 4.0f);
         ourShader.setVec3("pointLight.position", pointLight.position);
         ourShader.setVec3("pointLight.ambient", pointLight.ambient);
-        ourShader.setVec3("pointLight.diffuse", pointLight.diffuse);
+        ourShader.setVec3("poin tLight.diffuse", pointLight.diffuse);
         ourShader.setVec3("pointLight.specular", pointLight.specular);
         ourShader.setFloat("pointLight.constant", pointLight.constant);
         ourShader.setFloat("pointLight.linear", pointLight.linear);
@@ -173,7 +242,8 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
                                programState->backpackPosition); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(programState->backpackScale));    // it's a bit too big for our scene, so scale it down
+        model = glm::scale(model, glm::vec3(
+                programState->backpackScale));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
