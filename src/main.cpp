@@ -137,9 +137,9 @@ int main() {
     reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
     reactphysics3d::Transform transform(position, orientation);
     reactphysics3d::RigidBody *body = world->createRigidBody(transform);
-    rp3d::Vector3 halfExtents(.0, 2.0, 2.0);
-    rp3d::BoxShape *boxShape = physicsCommon.createBoxShape(halfExtents);
-    body->addCollider(boxShape, rp3d::Transform::identity());
+    rp3d::Vector3 halfExtents(0.5, 0.75, 0.5);
+    auto colliderShape = physicsCommon.createCapsuleShape(0.5, 1.6);
+    body->addCollider(colliderShape, rp3d::Transform::identity());
 
     // arena
     auto arenaTransform = rp3d::Transform::identity();
@@ -170,6 +170,14 @@ int main() {
             world->update(timeStep);
             accumulator -= timeStep;
         }
+
+        auto camForce = rp3d::Vector3(
+                programState->camera.Front.x,
+                programState->camera.Front.y,
+                programState->camera.Front.z
+        );
+        camForce *= deltaTime * 500.0f;
+        body->applyForceToCenterOfMass(camForce);
 
         auto camPos = body->getTransform().getPosition();
         programState->camera.Position.x = camPos.x;
