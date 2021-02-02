@@ -11,7 +11,7 @@ function(watch)
 endfunction()
 
 set(CMAKE_POLICY_DEFAULT_CMP0012 NEW)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-variable -Wno-unused-parameter -O3")
 
@@ -25,6 +25,7 @@ find_package(ASSIMP REQUIRED)
 add_subdirectory(libs/glad)
 add_subdirectory(libs/imgui)
 add_subdirectory(libs/reactphysics3d)
+add_subdirectory(tests)
 
 add_definitions(${OPENGL_DEFINITIONS})
 
@@ -43,7 +44,7 @@ include_directories(${CMAKE_BINARY_DIR}/configuration)
 
 include_directories(include/)
 add_executable(${PROJECT_NAME}
-        ${SOURCES} include/ConcaveCollider.h)
+        ${SOURCES} include/ConcaveCollider.h src/Entity/Entity.cpp src/Entity/Entity.h src/Entity/Component.h src/Entity/EntityManager.cpp src/Entity/EntityManager.h)
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
