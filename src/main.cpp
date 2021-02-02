@@ -11,7 +11,7 @@
 #include <learnopengl/model.h>
 
 #include <iostream>
-
+#include "Entity/EntityManager.h"
 #include "reactphysics3d/reactphysics3d.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -36,25 +36,12 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-struct PointLight {
-    glm::vec3 position;
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-
-    float constant;
-    float linear;
-    float quadratic;
-};
-
 struct ProgramState {
     glm::vec3 clearColor = glm::vec3(0);
     Camera camera;
     bool CameraMouseMovementUpdateEnabled = true;
     glm::vec3 backpackPosition = glm::vec3(0.0f);
     float backpackScale = 1.0f;
-    PointLight pointLight;
-
     ProgramState()
             : camera(glm::vec3(0.0f, 0.0f, 3.0f)) {}
 
@@ -120,15 +107,19 @@ int main() {
     Model ourModel("resources/objects/arena/arena.obj", physicsCommon);
     ourModel.SetShaderTextureNamePrefix("material.");
 
-    PointLight &pointLight = programState->pointLight;
-    pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
-    pointLight.ambient = glm::vec3(5, 5, 5);
-    pointLight.diffuse = glm::vec3(0.9, 0.9, 0.9);
-    pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
+    auto light = Entity();
+    auto lc = LightComponent(
+                glm::vec3(4.0f, 4.0, 0.0),
+                glm::vec3(5, 5, 5),
+                glm::vec3(0.9, 0.9, 0.9),
+                glm::vec3(1.0, 1.0, 1.0),
+                1.0f,
+                0.09f,
+                0.032f
+            );
+    light.addComponent<LightComponent>(lc);
 
-    pointLight.constant = 1.0f;
-    pointLight.linear = 0.09f;
-    pointLight.quadratic = 0.032f;
+    EntityManager::getManager().addEntity(&light);
 
     // ReactPhysics3D HelloWorld
     reactphysics3d::PhysicsWorld *world = physicsCommon.createPhysicsWorld();
@@ -197,14 +188,15 @@ int main() {
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
-        pointLight.position = glm::vec3(3.0f, 4.0f, 4.0f);
-        ourShader.setVec3("pointLight.position", pointLight.position);
-        ourShader.setVec3("pointLight.ambient", pointLight.ambient);
-        ourShader.setVec3("poin tLight.diffuse", pointLight.diffuse);
-        ourShader.setVec3("pointLight.specular", pointLight.specular);
-        ourShader.setFloat("pointLight.constant", pointLight.constant);
-        ourShader.setFloat("pointLight.linear", pointLight.linear);
-        ourShader.setFloat("pointLight.quadratic", pointLight.quadratic);
+        auto pointLight = EntityManager::getManager().getAllComponents<LightComponent>()[0];
+        pointLight->position = glm::vec3(3.0f, 4.0f, 4.0f);
+        ourShader.setVec3("pointLight.position", pointLight->position);
+        ourShader.setVec3("pointLight.ambient", pointLight->ambient);
+        ourShader.setVec3("poin tLight.diffuse", pointLight->diffuse);
+        ourShader.setVec3("pointLight.specular", pointLight->specular);
+        ourShader.setFloat("pointLight.constant", pointLight->constant);
+        ourShader.setFloat("pointLight.linear", pointLight->linear);
+        ourShader.setFloat("pointLight.quadratic", pointLight->quadratic);
         ourShader.setVec3("viewPosition", programState->camera.Position);
         ourShader.setFloat("material.shininess", 32.0f);
         // view/projection transformations
