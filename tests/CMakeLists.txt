@@ -1,0 +1,1 @@
+add_executable(Catch_tests_run EntityTest.cpp EntityManagerTest.cpp)
