@@ -1,5 +1,8 @@
+#ifndef GLFW_HEAD_H
+#define GLFW_HEAD_H
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#endif
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,18 +16,17 @@
 #include <iostream>
 #include "Entity/EntityManager.h"
 #include "reactphysics3d/reactphysics3d.h"
+#include "Controller/PlayerController.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+//void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1366;
+const unsigned int SCR_HEIGHT = 768;
 
 // camera
 
@@ -35,21 +37,6 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-
-struct ProgramState {
-    glm::vec3 clearColor = glm::vec3(0);
-    Camera camera;
-    bool CameraMouseMovementUpdateEnabled = true;
-    glm::vec3 backpackPosition = glm::vec3(0.0f);
-    float backpackScale = 1.0f;
-    ProgramState()
-            : camera(glm::vec3(0.0f, 0.0f, 3.0f)) {}
-
-
-};
-
-
-ProgramState *programState;
 
 int main() {
     // glfw: initialize and configure
@@ -73,30 +60,18 @@ int main() {
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-    // tell GLFW to capture our mouse
+    //glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
-    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    // Blender texture works fine without flipping
-//    stbi_set_flip_vertically_on_load(true);
-
-    programState = new ProgramState;
-
-    // configure global opengl state
-    // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
-    // build and compile shaders
-    // -------------------------
+    PlayerController::init();
+
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
 
     // rp3d physicsCommon factory
@@ -148,6 +123,7 @@ int main() {
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
+        auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
@@ -162,6 +138,7 @@ int main() {
             accumulator -= timeStep;
         }
 
+        /*
         auto camForce = rp3d::Vector3(
                 programState->camera.Front.x,
                 programState->camera.Front.y,
@@ -174,19 +151,19 @@ int main() {
         programState->camera.Position.x = camPos.x;
         programState->camera.Position.y = camPos.y;
         programState->camera.Position.z = camPos.z;
-
+        */
 
         // input
         // -----
-        processInput(window);
-
-
+        PlayerController::processInput(window, deltaTime);
         // render
         // ------
-        glClearColor(programState->clearColor.r, programState->clearColor.g, programState->clearColor.b, 1.0f);
+        glm::vec3 clearColor = glm::vec3(0);
+        glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // don't forget to enable shader before setting uniforms
+        // don't forget to enable shader before setting uniform
+        // view/projection transformations
         ourShader.use();
         auto pointLight = EntityManager::getManager().getAllComponents<LightComponent>()[0];
         pointLight->position = glm::vec3(3.0f, 4.0f, 4.0f);
@@ -197,23 +174,25 @@ int main() {
         ourShader.setFloat("pointLight.constant", pointLight->constant);
         ourShader.setFloat("pointLight.linear", pointLight->linear);
         ourShader.setFloat("pointLight.quadratic", pointLight->quadratic);
-        ourShader.setVec3("viewPosition", programState->camera.Position);
         ourShader.setFloat("material.shininess", 32.0f);
-        // view/projection transformations
-        glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom),
-                                                (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = programState->camera.GetViewMatrix();
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
 
-        // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model,
-                               programState->backpackPosition); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(
-                programState->backpackScale));    // it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model);
-        ourModel.Draw(ourShader);
+        for(const auto player : players){
+
+            auto cameraComponent = player->getComponent<CameraComponent>();
+            glViewport(cameraComponent->camIndex * SCR_WIDTH * 0.5, 0, SCR_WIDTH*0.5, SCR_HEIGHT);
+
+            ourShader.setVec3("viewPosition", cameraComponent->camera.Position);
+            glm::mat4 projection = glm::perspective(glm::radians(cameraComponent->camera.Zoom),
+                                                    (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
+            glm::mat4 view = cameraComponent->getViewMatrix();
+            ourShader.setMat4("projection", projection);
+            ourShader.setMat4("view", view);
+
+            // render the loaded model
+            glm::mat4 model = glm::mat4(1.0f);
+            ourShader.setMat4("model", model);
+            ourModel.Draw(ourShader);
+        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -221,28 +200,12 @@ int main() {
         glfwPollEvents();
     }
 
-    delete programState;
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        programState->camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        programState->camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        programState->camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        programState->camera.ProcessKeyboard(RIGHT, deltaTime);
-}
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
@@ -254,6 +217,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
+/*
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     if (firstMouse) {
         lastX = xpos;
@@ -270,9 +234,4 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     if (programState->CameraMouseMovementUpdateEnabled)
         programState->camera.ProcessMouseMovement(xoffset, yoffset);
 }
-
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    programState->camera.ProcessMouseScroll(yoffset);
-}
+ */

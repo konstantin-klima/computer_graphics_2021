@@ -7,6 +7,7 @@
 
 
 #include <glm/vec3.hpp>
+#include <learnopengl/camera.h>
 
 // Base component code adapted from Nikola Sobajic
 typedef unsigned ComponentTypeID;
@@ -53,5 +54,25 @@ struct LightComponent: public Component {
     LightComponent(glm::vec3&& position, glm::vec3&& ambient, glm::vec3&& defuse, glm::vec3&& specular, float constant, float linear, float quadratic)
     :position(position), ambient(ambient), diffuse(diffuse), specular(specular), constant(constant), linear(linear), quadratic(quadratic) {};
 };
+
+struct CameraComponent: public Component {
+    CameraComponent(glm::vec3 pos, unsigned index) :camIndex(index) { camera = Camera(pos); }
+    CameraComponent(Camera cam, unsigned index) : camera(camera), camIndex(index) {};
+    CameraComponent(float x, float y, float z, unsigned index) :camIndex(index) {camera = Camera(glm::vec3(x, y, z));};
+
+    Camera camera;
+    void setCameraPos(glm::vec3 pos){
+        camera.Position = pos;
+    }
+
+    glm::mat4 getViewMatrix(){
+        return camera.GetViewMatrix();
+    }
+
+    unsigned camIndex;
+
+};
+
+
 
 #endif //PROJECT_BASE_COMPONENT_H
