@@ -9,15 +9,14 @@ void RenderController::init() {
 }
 
 void RenderController::render() {
+    clearGlBuffers();
     updateLights();
     drawEntities();
 }
 
 
 void RenderController::loadShaders(){
-    auto basic = new Shader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
 
-    ShaderManager::getManager().addShader( "basic", basic);
 }
 
 void RenderController::updateLights() {
@@ -26,7 +25,11 @@ void RenderController::updateLights() {
 
     for(auto shader : shaders){
         shader->use();
-        auto pointLight = EntityManager::getManager().getAllComponents<LightComponent>()[0];
+        auto pls = EntityManager::getManager().getAllComponents<LightComponent>();
+        if(pls.size() == 0)
+            continue;
+
+        auto pointLight = pls[0];
         for(const auto& light : lights){
             if(light->type == LIGHTS::SPECULAR){
                 shader->setVec3("pointLight.position", pointLight->position);
@@ -44,6 +47,12 @@ void RenderController::updateLights() {
         }
     }
 
+}
+
+void RenderController::clearGlBuffers(){
+    glm::vec3 clearColor = glm::vec3(0);
+    glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderController::drawEntities() {
