@@ -3,6 +3,7 @@
 //
 
 #include "PlayerController.h"
+#include "../Entity/EntityManager.h"
 
 void PlayerController::init() {
     if(initialized){

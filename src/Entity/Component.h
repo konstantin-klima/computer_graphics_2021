@@ -8,6 +8,9 @@
 
 #include <glm/vec3.hpp>
 #include <learnopengl/camera.h>
+#include <learnopengl/shader.h>
+#include <learnopengl/model.h>
+
 
 // Base component code adapted from Nikola Sobajic
 typedef unsigned ComponentTypeID;
@@ -73,6 +76,57 @@ struct CameraComponent: public Component {
 
 };
 
+struct ShaderComponent: public Component {
+    std::unordered_map<std::string, Shader*> shaders;
+
+    ShaderComponent() = default;
+
+    void addShader(const std::string& name, Shader* s) {
+        shaders[name] = s;
+    }
+
+    void removeShader(const std::string& name){
+        auto s = shaders.find(name);
+        if(s != shaders.end()){
+            shaders.erase(s);
+        }
+    }
+
+    Shader* getShader(const std::string& name) const {
+        auto it = shaders.find(name);
+        if(it != shaders.end())
+            return it->second;
+        else{
+            return nullptr;
+        }
+
+
+    }
+
+    std::vector<Shader*> getAllShaders() const {
+        std::vector<Shader*> res;
+        for(const auto& it : shaders){
+            res.push_back(it.second);
+        }
+
+        return res;
+    }
+};
+
+struct ModelComponent: public Component {
+    explicit ModelComponent(Model* model) :model(model) {};
+
+    void setModel(Model* model){
+        this->model = model;
+    }
+
+    Model* getModel() const {
+        return model;
+    }
+
+private:
+    Model* model;
+};
 
 
 #endif //PROJECT_BASE_COMPONENT_H
