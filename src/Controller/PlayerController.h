@@ -11,8 +11,6 @@
 #include <GLFW/glfw3.h>
 #endif
 
-#include "../Entity/EntityManager.h"
-
 struct PlayerController {
     inline static bool initialized = false;
 

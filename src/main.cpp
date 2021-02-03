@@ -5,18 +5,18 @@
 #endif
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <learnopengl/filesystem.h>
-#include <learnopengl/shader.h>
-#include <learnopengl/camera.h>
 #include <learnopengl/model.h>
+
+#include "constants.h"
 
 #include <iostream>
 #include "Entity/EntityManager.h"
+#include "Entity/ModelManager.h"
+#include "Entity/ShaderManager.h"
 #include "reactphysics3d/reactphysics3d.h"
 #include "Controller/PlayerController.h"
+#include "Controller/RenderController.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -25,13 +25,12 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 1366;
-const unsigned int SCR_HEIGHT = 768;
+
 
 // camera
 
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
+float lastX = Settings::SCR_WIDTH / 2.0f;
+float lastY = Settings::SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // timing
@@ -52,7 +51,7 @@ int main() {
 
     // glfw window creation
     // --------------------
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(Settings::SCR_WIDTH, Settings::SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -71,16 +70,27 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     PlayerController::init();
+    RenderController::init();
 
-    Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
+
 
     // rp3d physicsCommon factory
     reactphysics3d::PhysicsCommon physicsCommon;
 
     // load models
     // -----------
-    Model ourModel("resources/objects/arena/arena.obj", physicsCommon);
-    ourModel.SetShaderTextureNamePrefix("material.");
+
+    auto arenaModel = new Model("resources/objects/arena/arena.obj", physicsCommon);
+    arenaModel->SetShaderTextureNamePrefix("material.");
+
+    ModelManager::getManager().addModel("arena", arenaModel);
+
+    auto arena = new Entity();
+    arena->addComponent<ModelComponent>(arenaModel);
+    auto arenaShader = ShaderComponent();
+    arenaShader.addShader("basic", ShaderManager::getManager().getShader("basic"));
+    arena->addComponent<ShaderComponent>(arenaShader);
+    EntityManager::getManager().addEntity(arena);
 
     auto light = Entity();
     auto lc = LightComponent(
@@ -111,7 +121,7 @@ int main() {
     auto arenaTransform = rp3d::Transform::identity();
     rp3d::RigidBody *arenaBody = world->createRigidBody(arenaTransform);
     arenaBody->setType(rp3d::BodyType::STATIC);
-    arenaBody->addCollider(ourModel.concaveCollider->collider, arenaTransform);
+    arenaBody->addCollider(arenaModel->concaveCollider->collider, arenaTransform);
     arenaBody->enableGravity(false);
 
     const reactphysics3d::decimal timeStep = 1.0f / 60.0f;
@@ -123,14 +133,14 @@ int main() {
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
-        auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
+
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // Physics
+        // Physicss
         accumulator += deltaTime;
 
         while (accumulator >= timeStep) {
@@ -162,37 +172,12 @@ int main() {
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        RenderController::render();
         // don't forget to enable shader before setting uniform
         // view/projection transformations
-        ourShader.use();
-        auto pointLight = EntityManager::getManager().getAllComponents<LightComponent>()[0];
-        pointLight->position = glm::vec3(3.0f, 4.0f, 4.0f);
-        ourShader.setVec3("pointLight.position", pointLight->position);
-        ourShader.setVec3("pointLight.ambient", pointLight->ambient);
-        ourShader.setVec3("poin tLight.diffuse", pointLight->diffuse);
-        ourShader.setVec3("pointLight.specular", pointLight->specular);
-        ourShader.setFloat("pointLight.constant", pointLight->constant);
-        ourShader.setFloat("pointLight.linear", pointLight->linear);
-        ourShader.setFloat("pointLight.quadratic", pointLight->quadratic);
-        ourShader.setFloat("material.shininess", 32.0f);
 
-        for(const auto player : players){
 
-            auto cameraComponent = player->getComponent<CameraComponent>();
-            glViewport(cameraComponent->camIndex * SCR_WIDTH * 0.5, 0, SCR_WIDTH*0.5, SCR_HEIGHT);
 
-            ourShader.setVec3("viewPosition", cameraComponent->camera.Position);
-            glm::mat4 projection = glm::perspective(glm::radians(cameraComponent->camera.Zoom),
-                                                    (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
-            glm::mat4 view = cameraComponent->getViewMatrix();
-            ourShader.setMat4("projection", projection);
-            ourShader.setMat4("view", view);
-
-            // render the loaded model
-            glm::mat4 model = glm::mat4(1.0f);
-            ourShader.setMat4("model", model);
-            ourModel.Draw(ourShader);
-        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
