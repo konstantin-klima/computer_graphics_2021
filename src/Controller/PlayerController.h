@@ -16,9 +16,9 @@
 struct PlayerController {
     inline static bool initialized = false;
 
-    static void init(rp3d::PhysicsWorld *world);
+    static void init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorld *world);
     static void update();
-    static void processInput(GLFWwindow *window, float deltaTime);
+    static void processInput(GLFWwindow *window);
 
 };
 

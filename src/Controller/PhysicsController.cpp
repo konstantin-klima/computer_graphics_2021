@@ -9,9 +9,9 @@
 #include <GLFW/glfw3.h>
 
 #include "PhysicsController.h"
-#include "../Entity/EntityManager.h"
 
 #include "reactphysics3d/reactphysics3d.h"
+#include <iostream>
 
 void PhysicsController::init() {
     if (initialized) {
@@ -39,7 +39,8 @@ void PhysicsController::update() {
         accumulator -= timeStep;
     }
 
-    float factor = accumulator / timeStep;
-
     // TODO: add interpolation
+
+//    float factor = accumulator / timeStep;
+
 }

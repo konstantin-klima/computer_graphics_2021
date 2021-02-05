@@ -13,6 +13,8 @@
 
 #include "reactphysics3d/reactphysics3d.h"
 
+#include <iostream>
+
 // Base component code adapted from Nikola Sobajic
 typedef unsigned ComponentTypeID;
 
@@ -71,7 +73,6 @@ struct CameraComponent : public Component {
     };
 
     Camera camera;
-
 
 
     void setCameraPos(glm::vec3 pos) {
@@ -141,7 +142,7 @@ private:
 struct RigidBodyComponent : public Component {
     RigidBodyComponent(rp3d::RigidBody *body) : body(body) {};
 
-    RigidBodyComponent(float x,float  y,float z,float pitch, float yaw, rp3d::PhysicsWorld *world) {
+    RigidBodyComponent(float x, float y, float z, float pitch, float yaw, rp3d::PhysicsWorld *world) {
         auto pos = rp3d::Vector3(x, y, z);
         auto orientation = rp3d::Quaternion::fromEulerAngles(yaw, pitch, 0);
         auto transform = rp3d::Transform(pos, orientation);
@@ -149,8 +150,12 @@ struct RigidBodyComponent : public Component {
         body = world->createRigidBody(transform);
     }
 
-    void setMass(float mass) const {
+    void setMass(float mass) {
         body->setMass(mass);
+    }
+
+    float getMass() const {
+        return body->getMass();
     }
 
     void setRigidBody(rp3d::RigidBody *body) {
@@ -191,18 +196,26 @@ struct RigidBodyComponent : public Component {
         body->getTransform().getOpenGLMatrix(transform);
 
         return glm::mat4({
-                 {transform[0], transform[1], transform[2],  transform[3]},
-                 {transform[4], transform[5], transform[6],  transform[7]},
-                 {transform[8], transform[9], transform[10], transform[11]},
-                 {transform[12], transform[13], transform[14], transform[15]}
-         });
+                                 {transform[0],  transform[1],  transform[2],  transform[3]},
+                                 {transform[4],  transform[5],  transform[6],  transform[7]},
+                                 {transform[8],  transform[9],  transform[10], transform[11]},
+                                 {transform[12], transform[13], transform[14], transform[15]}
+                         });
     }
 
     void setLinearVelocity(const rp3d::Vector3 vel) {
         body->setLinearVelocity(vel);
     }
 
-    rp3d::Vector3  getLinearVelocity(const rp3d::Vector3 vel) {
+    void setLinearVelocity(float x, float y, float z, float speed) {
+        body->setLinearVelocity(rp3d::Vector3(x * speed, y * speed, z * speed));
+    }
+
+    void setLinearVelocity(const rp3d::Vector3 &dir, const float speed) {
+        body->setLinearVelocity(dir * speed);
+    }
+
+    rp3d::Vector3 getLinearVelocity() const {
         body->getLinearVelocity();
     }
 
@@ -210,49 +223,61 @@ struct RigidBodyComponent : public Component {
         body->applyForceToCenterOfMass(force);
     }
 
+    glm::vec3 getGLMPosition() const {
+        auto pos = body->getTransform().getPosition();
+
+        return glm::vec3(pos.x, pos.y, pos.z);
+    }
+
+    rp3d::Collider *addCollider(rp3d::CollisionShape *shape) {
+        return body->addCollider(shape, rp3d::Transform::identity());
+    }
 
 private:
     rp3d::RigidBody *body;
     rp3d::Transform prevTransform;
 };
 
-// Might be useless because you can set the velocity of rigid body directly
-struct VelocityComponent : public Component {
-    VelocityComponent(float vx, float vy, float vz)
-        : velocity(new rp3d::Vector3(vx, vy, vz)) {};
+struct MovementComponent : public Component {
+    MovementComponent(float dirx, float diry, float dirz, float speed)
+            : direction(new rp3d::Vector3(dirx, diry, dirz)), speed(speed) {};
 
-    explicit VelocityComponent(rp3d::Vector3 *vel) : velocity(vel) {};
+    explicit MovementComponent(rp3d::Vector3 *dir, float speed) : direction(new rp3d::Vector3(dir->x, dir->y, dir->z)),
+                                                                  speed(speed) {};
 
-    explicit VelocityComponent(glm::vec3 *vel)
-        : velocity(new rp3d::Vector3(vel->x, vel->y, vel->z)) {};
+    explicit MovementComponent(glm::vec3 *dir, float speed)
+            : direction(new rp3d::Vector3(dir->x, dir->y, dir->z)), speed(speed) {};
 
-    rp3d::Vector3 *getVelocity() const {
-        return velocity;
+    rp3d::Vector3 getDirection() const {
+        return *
+                direction;
     }
 
-    glm::vec3 *getGLMVVelocity() const {
-        return new glm::vec3(velocity->x, velocity->y, velocity->z);
+    glm::vec3 *getGLMVDirection() const {
+        return new glm::vec3(direction->x, direction->y, direction->z);
     }
 
-    float getMagnitude() const {
-        return velocity->length();
+    void setDirection(rp3d::Vector3 *dir) {
+        direction->x = dir->x;
+        direction->y = dir->y;
+        direction->z = dir->z;
     }
 
-    rp3d::Vector3 *getDirection() const {
-        return direction;
+    float getSpeed() const {
+        return speed;
     }
 
     void setVelocity(rp3d::Vector3 *vel) {
-        velocity = vel;
-        direction->x = vel->x / vel->length();
-        direction->y = vel->y / vel->length();
-        direction->z = vel->z / vel->length();
-
+        speed = vel->length();
+        direction->x = vel->x / speed;
+        direction->y = vel->y / speed;
+        direction->z = vel->z / speed;
     }
 
+
 private:
-    rp3d::Vector3 *velocity;
     rp3d::Vector3 *direction;
+    float speed;
 };
 
 
@@ -263,7 +288,7 @@ enum SPELL_TYPES {
 
 struct SpellPropertyComponent : public Component {
     SpellPropertyComponent(float damage, float range, SPELL_TYPES type)
-        : damage(damage), range(range), type(type) {};
+            : damage(damage), range(range), type(type) {};
 
     float getDamage() const {
         return damage;
@@ -273,7 +298,7 @@ struct SpellPropertyComponent : public Component {
         return range;
     }
 
-    SPELL_TYPES getType () const {
+    SPELL_TYPES getType() const {
         return type;
     }
 
@@ -285,7 +310,7 @@ struct SpellPropertyComponent : public Component {
         this->range = range;
     }
 
-    void setTyoe(const SPELL_TYPES type) {
+    void setType(const SPELL_TYPES type) {
         this->type = type;
     }
 
@@ -295,5 +320,38 @@ private:
     SPELL_TYPES type;
 };
 
+enum COLLIDER_TYPES {
+    BOX,
+    SPHERE,
+    CAPSULE,
+    CONCAVE,
+    CONVEX,
+};
+
+struct CapsuleColliderComponent : public Component {
+    CapsuleColliderComponent(float radius, float height, rp3d::PhysicsCommon *physicsCommon) {
+        shape = physicsCommon->createCapsuleShape(radius, height);
+    }
+
+    rp3d::CapsuleShape *getShape() const {
+        return shape;
+    }
+
+private:
+    rp3d::CapsuleShape *shape;
+};
+
+struct BoxColliderComponent : public Component {
+    BoxColliderComponent(float halfX, float halfY, float halfZ, rp3d::PhysicsCommon *physicsCommon) {
+        shape = physicsCommon->createBoxShape(rp3d::Vector3(halfX, halfY, halfZ));
+    }
+
+    rp3d::BoxShape *getShape() const {
+        return shape;
+    }
+
+private:
+    rp3d::BoxShape *shape;
+};
 
 #endif //PROJECT_BASE_COMPONENT_H

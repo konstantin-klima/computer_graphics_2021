@@ -26,10 +26,10 @@ private:
     inline static bool initialized = false;
     // zasto mora inline???
     inline static const float timeStep = 1 / 60.0f;
-    static rp3d::PhysicsCommon *physicsCommon;
-    static rp3d::PhysicsWorld *world;
-    static float previousTime;
-    static float accumulator;
+    inline static rp3d::PhysicsCommon *physicsCommon;
+    inline static rp3d::PhysicsWorld *world;
+    inline static float previousTime;
+    inline static float accumulator;
 };
 
 #endif //PROJECT_BASE_PHYSICSCONTROLLER_H
