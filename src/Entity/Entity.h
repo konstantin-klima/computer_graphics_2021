@@ -31,6 +31,8 @@ public:
 
     template<typename T>
     bool hasComponent() {
+        if(m_Comps.size() == 0)
+            return false;
         auto id = Component::GetComponentTypeID<T>();
         auto res = std::find_if(m_Comps.begin(), m_Comps.end(), [id](std::unique_ptr<Component>& c){return c->m_TypeId == id;});
 

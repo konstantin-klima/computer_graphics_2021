@@ -18,10 +18,10 @@ public:
     static void render();
 
     static void loadShaders();
-
     static void updateLights();
-
     static void drawEntities();
+
+    static void clearGlBuffers();
 };
 
 

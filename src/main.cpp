@@ -17,6 +17,7 @@
 #include "reactphysics3d/reactphysics3d.h"
 #include "Controller/PlayerController.h"
 #include "Controller/RenderController.h"
+#include "Controller/LevelController.h"
 #include "Controller/PhysicsController.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -25,6 +26,10 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void processInput(GLFWwindow *window);
 
+GLFWwindow* setupWindow();
+void loadModels();
+void loadShaders();
+void initControllers(reactphysics3d::PhysicsWorld *world);
 // settings
 
 
@@ -39,56 +44,10 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 int main() {
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    auto window = setupWindow();
+    loadModels();
+    loadShaders();
 
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-    // glfw window creation
-    // --------------------
-    GLFWwindow *window = glfwCreateWindow(Settings::SCR_WIDTH, Settings::SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-    if (window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    //glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-
-    glEnable(GL_DEPTH_TEST);
-
-    PhysicsController::init();
-    PlayerController::init(PhysicsController::getPhysicsCommon(), PhysicsController::getWorld());
-    RenderController::init();
-
-
-    // load models
-    // -----------
-
-    auto arenaModel = new Model("resources/objects/arena/arena.obj", PhysicsController::getPhysicsCommon());
-    arenaModel->SetShaderTextureNamePrefix("material.");
-
-    ModelManager::getManager().addModel("arena", arenaModel);
-
-    auto arena = new Entity();
-    arena->addComponent<ModelComponent>(arenaModel);
-    auto arenaShader = ShaderComponent();
-    arenaShader.addShader("basic", ShaderManager::getManager().getShader("basic"));
-    arena->addComponent<ShaderComponent>(arenaShader);
-    EntityManager::getManager().addEntity(arena);
 
     auto light = Entity();
     auto lc = LightComponent(
@@ -105,21 +64,56 @@ int main() {
     EntityManager::getManager().addEntity(&light);
 
     // ReactPhysics3D HelloWorld
-    auto world = PhysicsController::getWorld();
+    reactphysics3d::PhysicsWorld *world = PhysicsController::getPhysicsCommon()->createPhysicsWorld();
 
     // arena
+    auto arenaModel = ModelManager::getModel("arena");
     auto arenaTransform = rp3d::Transform::identity();
     rp3d::RigidBody *arenaBody = world->createRigidBody(arenaTransform);
     arenaBody->setType(rp3d::BodyType::STATIC);
     arenaBody->addCollider(arenaModel->concaveCollider->collider, arenaTransform);
     arenaBody->enableGravity(false);
 
+    const reactphysics3d::decimal timeStep = 1.0f / 60.0f;
+    float accumulator = 0;
+
+    // draw in wireframe
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
-        PlayerController::update();
-        PhysicsController::update();
 
+        // per-frame time logic
+        // --------------------
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        // Physicss
+        accumulator += deltaTime;
+
+        while (accumulator >= timeStep) {
+            world->update(timeStep);
+            accumulator -= timeStep;
+        }
+
+        /*
+        auto camForce = rp3d::Vector3(
+                programState->camera.Front.x,
+                programState->camera.Front.y,
+                programState->camera.Front.z
+        );
+        camForce *= deltaTime * 500.0f;
+        body->applyForceToCenterOfMass(camForce);
+
+        auto camPos = body->getTransform().getPosition();
+        programState->camera.Position.x = camPos.x;
+        programState->camera.Position.y = camPos.y;
+        programState->camera.Position.z = camPos.z;
+        */
+
+        // input
         // -----
         PlayerController::processInput(window);
         // render
@@ -176,3 +170,57 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
         programState->camera.ProcessMouseMovement(xoffset, yoffset);
 }
  */
+
+GLFWwindow* setupWindow(){
+    // glfw: initialize and configure
+    // ------------------------------
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    #ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    #endif
+
+    GLFWwindow *window = glfwCreateWindow(Settings::SCR_WIDTH, Settings::SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    if (window == NULL) {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    glEnable(GL_DEPTH_TEST);
+
+    return window;
+}
+
+// TODO Izmesti Physics related stvari u Physics controler i komponente
+void initControllers(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon *physicsCommon) {
+    PlayerController::init(physicsCommon, world);
+    RenderController::init();
+    LevelController::init(world);
+
+}
+
+void loadModels() {
+    auto arenaModel = new Model("resources/objects/arena/arena.obj", PhysicsController::getPhysicsCommon());
+    arenaModel->SetShaderTextureNamePrefix("material.");
+
+    ModelManager::getManager().addModel("arena", arenaModel);
+}
+
+void loadShaders(){
+    auto basic = new Shader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
+
+    ShaderManager::getManager().addShader( "basic", basic);
+}
