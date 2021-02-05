@@ -9,14 +9,17 @@
 #define GLFW_HEAD_H
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include "reactphysics3d/reactphysics3d.h"
 #endif
 
 struct PlayerController {
     inline static bool initialized = false;
 
-    static void init();
+    static void init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorld *world);
     static void update();
-    static void processInput(GLFWwindow *window, float deltaTime);
+    static void processInput(GLFWwindow *window);
+
 };
 
 

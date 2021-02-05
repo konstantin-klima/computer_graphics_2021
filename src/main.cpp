@@ -17,6 +17,7 @@
 #include "reactphysics3d/reactphysics3d.h"
 #include "Controller/PlayerController.h"
 #include "Controller/RenderController.h"
+#include "Controller/PhysicsController.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -69,18 +70,15 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    PlayerController::init();
+    PhysicsController::init();
+    PlayerController::init(PhysicsController::getPhysicsCommon(), PhysicsController::getWorld());
     RenderController::init();
 
-
-
-    // rp3d physicsCommon factory
-    reactphysics3d::PhysicsCommon physicsCommon;
 
     // load models
     // -----------
 
-    auto arenaModel = new Model("resources/objects/arena/arena.obj", physicsCommon);
+    auto arenaModel = new Model("resources/objects/arena/arena.obj", PhysicsController::getPhysicsCommon());
     arenaModel->SetShaderTextureNamePrefix("material.");
 
     ModelManager::getManager().addModel("arena", arenaModel);
@@ -107,15 +105,7 @@ int main() {
     EntityManager::getManager().addEntity(&light);
 
     // ReactPhysics3D HelloWorld
-    reactphysics3d::PhysicsWorld *world = physicsCommon.createPhysicsWorld();
-
-    reactphysics3d::Vector3 position(0, 10, 0);
-    reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
-    reactphysics3d::Transform transform(position, orientation);
-    reactphysics3d::RigidBody *body = world->createRigidBody(transform);
-    rp3d::Vector3 halfExtents(0.5, 0.75, 0.5);
-    auto colliderShape = physicsCommon.createCapsuleShape(0.5, 1.6);
-    body->addCollider(colliderShape, rp3d::Transform::identity());
+    auto world = PhysicsController::getWorld();
 
     // arena
     auto arenaTransform = rp3d::Transform::identity();
@@ -124,48 +114,14 @@ int main() {
     arenaBody->addCollider(arenaModel->concaveCollider->collider, arenaTransform);
     arenaBody->enableGravity(false);
 
-    const reactphysics3d::decimal timeStep = 1.0f / 60.0f;
-    float accumulator = 0;
-
-    // draw in wireframe
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
+        PlayerController::update();
+        PhysicsController::update();
 
-        // per-frame time logic
-        // --------------------
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        // Physicss
-        accumulator += deltaTime;
-
-        while (accumulator >= timeStep) {
-            world->update(timeStep);
-            accumulator -= timeStep;
-        }
-
-        /*
-        auto camForce = rp3d::Vector3(
-                programState->camera.Front.x,
-                programState->camera.Front.y,
-                programState->camera.Front.z
-        );
-        camForce *= deltaTime * 500.0f;
-        body->applyForceToCenterOfMass(camForce);
-
-        auto camPos = body->getTransform().getPosition();
-        programState->camera.Position.x = camPos.x;
-        programState->camera.Position.y = camPos.y;
-        programState->camera.Position.z = camPos.z;
-        */
-
-        // input
         // -----
-        PlayerController::processInput(window, deltaTime);
+        PlayerController::processInput(window);
         // render
         // ------
         glm::vec3 clearColor = glm::vec3(0);

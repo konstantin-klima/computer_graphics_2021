@@ -44,7 +44,7 @@ include_directories(${CMAKE_BINARY_DIR}/configuration)
 
 include_directories(include/)
 add_executable(${PROJECT_NAME}
-        ${SOURCES} include/ConcaveCollider.h src/Entity/Entity.cpp src/Entity/Entity.h src/Entity/Component.h src/Entity/EntityManager.cpp src/Entity/EntityManager.h src/Controller/PlayerController.cpp src/Controller/PlayerController.h src/Controller/RenderController.cpp src/Controller/RenderController.h src/Entity/ShaderManager.h src/constants.h include/common.cpp include/learnopengl/model.h.cpp)
+        ${SOURCES} include/ConcaveCollider.h src/Entity/Entity.cpp src/Entity/Entity.h src/Entity/Component.h src/Entity/EntityManager.cpp src/Entity/EntityManager.h src/Controller/PlayerController.cpp src/Controller/PlayerController.h src/Controller/RenderController.cpp src/Controller/RenderController.h src/Entity/ShaderManager.h src/constants.h include/common.cpp include/learnopengl/model.h.cpp src/Controller/PhysicsController.h src/Controller/PhysicsController.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
