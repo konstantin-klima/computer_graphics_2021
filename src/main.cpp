@@ -17,6 +17,7 @@
 #include "reactphysics3d/reactphysics3d.h"
 #include "Controller/PlayerController.h"
 #include "Controller/RenderController.h"
+#include "Controller/PhysicsController.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -69,7 +70,8 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    PlayerController::init();
+    PhysicsController::init();
+    PlayerController::init(PhysicsController::getWorld());
     RenderController::init();
 
 
