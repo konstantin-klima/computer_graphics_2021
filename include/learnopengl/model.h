@@ -42,9 +42,14 @@ public:
     ConcaveCollider *concaveCollider;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const &path, rp3d::PhysicsCommon *physicsCommon, bool gamma = false) : gammaCorrection(gamma)
+    Model(string const path, rp3d::PhysicsCommon *physicsCommon, bool gamma = false) : gammaCorrection(gamma)
     {
         loadModel(path);
+
+        for (auto mesh : meshes) {
+            std::cout << mesh.numFaces << std::endl;
+        }
+
         concaveCollider = new ConcaveCollider(meshes, *physicsCommon);
 
     }

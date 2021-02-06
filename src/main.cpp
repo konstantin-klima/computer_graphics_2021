@@ -1,7 +1,9 @@
 #ifndef GLFW_HEAD_H
 #define GLFW_HEAD_H
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #endif
 
 #include <glm/glm.hpp>
@@ -24,12 +26,15 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 //void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
-void processInput(GLFWwindow *window);
 
-GLFWwindow* setupWindow();
+GLFWwindow *setupWindow();
+
 void loadModels();
+
 void loadShaders();
-void initControllers(reactphysics3d::PhysicsWorld *world);
+
+void initControllers(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon *physicsCommon);
+
 // settings
 
 
@@ -44,21 +49,23 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 int main() {
+    PhysicsController::init();
     auto window = setupWindow();
     loadModels();
+    initControllers(PhysicsController::getWorld(), PhysicsController::getPhysicsCommon());
     loadShaders();
 
 
     auto light = Entity();
     auto lc = LightComponent(
-                glm::vec3(4.0f, 4.0, 0.0),
-                glm::vec3(5, 5, 5),
-                glm::vec3(0.9, 0.9, 0.9),
-                glm::vec3(1.0, 1.0, 1.0),
-                1.0f,
-                0.09f,
-                0.032f
-            );
+            glm::vec3(4.0f, 4.0, 0.0),
+            glm::vec3(5, 5, 5),
+            glm::vec3(0.9, 0.9, 0.9),
+            glm::vec3(1.0, 1.0, 1.0),
+            1.0f,
+            0.09f,
+            0.032f
+    );
     light.addComponent<LightComponent>(lc);
 
     EntityManager::getManager().addEntity(&light);
@@ -67,7 +74,7 @@ int main() {
     reactphysics3d::PhysicsWorld *world = PhysicsController::getPhysicsCommon()->createPhysicsWorld();
 
     // arena
-    auto arenaModel = ModelManager::getModel("arena");
+    auto arenaModel = ModelManager::getManager().getModel("arena");
     auto arenaTransform = rp3d::Transform::identity();
     rp3d::RigidBody *arenaBody = world->createRigidBody(arenaTransform);
     arenaBody->setType(rp3d::BodyType::STATIC);
@@ -91,28 +98,7 @@ int main() {
         lastFrame = currentFrame;
 
         // Physicss
-        accumulator += deltaTime;
-
-        while (accumulator >= timeStep) {
-            world->update(timeStep);
-            accumulator -= timeStep;
-        }
-
-        /*
-        auto camForce = rp3d::Vector3(
-                programState->camera.Front.x,
-                programState->camera.Front.y,
-                programState->camera.Front.z
-        );
-        camForce *= deltaTime * 500.0f;
-        body->applyForceToCenterOfMass(camForce);
-
-        auto camPos = body->getTransform().getPosition();
-        programState->camera.Position.x = camPos.x;
-        programState->camera.Position.y = camPos.y;
-        programState->camera.Position.z = camPos.z;
-        */
-
+        PhysicsController::update();
         // input
         // -----
         PlayerController::processInput(window);
@@ -171,7 +157,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 }
  */
 
-GLFWwindow* setupWindow(){
+GLFWwindow *setupWindow() {
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -179,9 +165,9 @@ GLFWwindow* setupWindow(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    #ifdef __APPLE__
+#ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
+#endif
 
     GLFWwindow *window = glfwCreateWindow(Settings::SCR_WIDTH, Settings::SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL) {
@@ -192,7 +178,7 @@ GLFWwindow* setupWindow(){
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     //glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -219,8 +205,8 @@ void loadModels() {
     ModelManager::getManager().addModel("arena", arenaModel);
 }
 
-void loadShaders(){
+void loadShaders() {
     auto basic = new Shader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
 
-    ShaderManager::getManager().addShader( "basic", basic);
+    ShaderManager::getManager().addShader("basic", basic);
 }
