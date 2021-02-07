@@ -185,7 +185,7 @@ void initControllers(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon *physicsComm
 }
 
 void loadModels() {
-    auto arenaModel = new Model("resources/objects/arena/arena.obj", PhysicsController::getPhysicsCommon());
+    auto arenaModel = new Model("resources/objects/arena/arena.obj");
     arenaModel->SetShaderTextureNamePrefix("material.");
 
     ModelManager::getManager().addModel("arena", arenaModel);
