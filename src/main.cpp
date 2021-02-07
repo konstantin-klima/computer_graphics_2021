@@ -26,19 +26,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 //void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
-
 GLFWwindow *setupWindow();
-
 void loadModels();
-
 void loadShaders();
+void initControllers();
 
-void initControllers(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon *physicsCommon);
-
-// settings
-
-
-// camera
 
 float lastX = Settings::SCR_WIDTH / 2.0f;
 float lastY = Settings::SCR_HEIGHT / 2.0f;
@@ -49,60 +41,27 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 int main() {
-    PhysicsController::init();
     auto window = setupWindow();
     loadModels();
-    initControllers(PhysicsController::getWorld(), PhysicsController::getPhysicsCommon());
+    initControllers();
     loadShaders();
 
-
-    auto light = Entity();
-    auto lc = LightComponent(
-            glm::vec3(4.0f, 4.0, 0.0),
-            glm::vec3(5, 5, 5),
-            glm::vec3(0.9, 0.9, 0.9),
-            glm::vec3(1.0, 1.0, 1.0),
-            1.0f,
-            0.09f,
-            0.032f
-    );
-    light.addComponent<LightComponent>(lc);
-
-    EntityManager::getManager().addEntity(&light);
-
-    // draw in wireframe
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    // render loop
-    // -----------
     while (!glfwWindowShouldClose(window)) {
 
-        // per-frame time logic
-        // --------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // Physicss
         PhysicsController::update();
-        // input
-        // -----
+
         PlayerController::processInput(window);
-        // render
-        // ------
+        PlayerController::update();
+
         glm::vec3 clearColor = glm::vec3(0);
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         RenderController::render();
-        // don't forget to enable shader before setting uniform
-        // view/projection transformations
 
-
-
-
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -117,8 +76,6 @@ int main() {
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
 
@@ -176,11 +133,11 @@ GLFWwindow *setupWindow() {
     return window;
 }
 
-// TODO Izmesti Physics related stvari u Physics controler i komponente
-void initControllers(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon *physicsCommon) {
-    PlayerController::init(physicsCommon, world);
+void initControllers() {
+    PhysicsController::init();
+    PlayerController::init(PhysicsController::getPhysicsCommon(), PhysicsController::getWorld());
     RenderController::init();
-    LevelController::init(world, physicsCommon);
+    LevelController::init(PhysicsController::getPhysicsCommon(), PhysicsController::getWorld());
 
 }
 

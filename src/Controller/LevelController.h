@@ -9,7 +9,7 @@
 #include "reactphysics3d/reactphysics3d.h"
 
 struct LevelController {
-    static void init(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon *physicsCommon);
+    static void init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorld *world);
     static void update();
 };
 

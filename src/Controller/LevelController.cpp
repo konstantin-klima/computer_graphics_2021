@@ -7,7 +7,7 @@
 #include "../Entity/ModelManager.h"
 #include "../Entity/ShaderManager.h"
 
-void LevelController::init(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon *physicsCommon) {
+void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorld *world) {
     // Arena setup
     auto arena = new Entity();
     arena->addComponent<ModelComponent>(ModelManager::getManager().getModel("arena"));
