@@ -9,7 +9,7 @@
 #include <iostream>
 
 
-#include "learnopengl//mesh.h"
+#include "learnopengl/mesh.h"
 #include "reactphysics3d/reactphysics3d.h"
 
 class ConcaveCollider {
@@ -19,14 +19,21 @@ private:
     std::vector<std::vector<int>> mIndices;
 
     rp3d::TriangleMesh *triangleMesh;
-public:
+
     rp3d::ConcaveMeshShape *collider;
+
+
+public:
 
     ConcaveCollider(const std::vector<Mesh> meshes, rp3d::PhysicsCommon &physicsCommon) {
 
 
         triangleMesh = createTriangleMesh(meshes, physicsCommon);
         collider = physicsCommon.createConcaveMeshShape(triangleMesh);
+    }
+
+    rp3d::ConcaveMeshShape *getShape() const {
+        return collider;
     }
 
 private:
