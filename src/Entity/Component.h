@@ -15,6 +15,8 @@
 
 #include <iostream>
 
+#include "ConcaveCollider.h"
+
 // Base component code adapted from Nikola Sobajic
 typedef unsigned ComponentTypeID;
 
@@ -135,6 +137,10 @@ struct ModelComponent : public Component {
         return model;
     }
 
+    std::vector<Mesh> getMeshes() const {
+        return model->meshes;
+    }
+
 private:
     Model *model;
 };
@@ -142,12 +148,17 @@ private:
 struct RigidBodyComponent : public Component {
     RigidBodyComponent(rp3d::RigidBody *body) : body(body) {};
 
-    RigidBodyComponent(float x, float y, float z, float pitch, float yaw, rp3d::PhysicsWorld *world) {
+    RigidBodyComponent(float x, float y, float z, float pitch, float yaw, rp3d::PhysicsWorld *world, bool env = false) {
         auto pos = rp3d::Vector3(x, y, z);
         auto orientation = rp3d::Quaternion::fromEulerAngles(yaw, pitch, 0);
         auto transform = rp3d::Transform(pos, orientation);
         prevTransform = transform;
         body = world->createRigidBody(transform);
+
+        if (env) {
+            body->setType(rp3d::BodyType::STATIC);
+            body->enableGravity(false);
+        }
     }
 
     void setMass(float mass) {
@@ -352,6 +363,18 @@ struct BoxColliderComponent : public Component {
 
 private:
     rp3d::BoxShape *shape;
+};
+
+struct ConcaveColliderComponent : public Component {
+    ConcaveColliderComponent(std::vector<Mesh> meshes, rp3d::PhysicsCommon *physicsCommon) {
+        collider = new ConcaveCollider(meshes, *physicsCommon);
+    }
+
+    rp3d::ConcaveMeshShape *getShape() const {
+        return collider->getShape();
+    }
+private:
+    ConcaveCollider *collider;
 };
 
 #endif //PROJECT_BASE_COMPONENT_H

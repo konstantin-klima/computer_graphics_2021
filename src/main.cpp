@@ -70,20 +70,6 @@ int main() {
 
     EntityManager::getManager().addEntity(&light);
 
-    // ReactPhysics3D HelloWorld
-    reactphysics3d::PhysicsWorld *world = PhysicsController::getPhysicsCommon()->createPhysicsWorld();
-
-    // arena
-    auto arenaModel = ModelManager::getManager().getModel("arena");
-    auto arenaTransform = rp3d::Transform::identity();
-    rp3d::RigidBody *arenaBody = world->createRigidBody(arenaTransform);
-    arenaBody->setType(rp3d::BodyType::STATIC);
-    arenaBody->addCollider(arenaModel->concaveCollider->collider, arenaTransform);
-    arenaBody->enableGravity(false);
-
-    const reactphysics3d::decimal timeStep = 1.0f / 60.0f;
-    float accumulator = 0;
-
     // draw in wireframe
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -194,7 +180,7 @@ GLFWwindow *setupWindow() {
 void initControllers(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon *physicsCommon) {
     PlayerController::init(physicsCommon, world);
     RenderController::init();
-    LevelController::init(world);
+    LevelController::init(world, physicsCommon);
 
 }
 
