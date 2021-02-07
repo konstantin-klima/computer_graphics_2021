@@ -27,6 +27,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 //void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 GLFWwindow *setupWindow();
+void loadResources();
 void loadModels();
 void loadShaders();
 void initControllers();
@@ -42,9 +43,9 @@ float lastFrame = 0.0f;
 
 int main() {
     auto window = setupWindow();
-    loadModels();
+    loadResources();
     initControllers();
-    loadShaders();
+
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -139,6 +140,11 @@ void initControllers() {
     RenderController::init();
     LevelController::init(PhysicsController::getPhysicsCommon(), PhysicsController::getWorld());
 
+}
+
+void loadResources(){
+    loadModels();
+    loadShaders();
 }
 
 void loadModels() {
