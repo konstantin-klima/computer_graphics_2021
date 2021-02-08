@@ -21,6 +21,7 @@
 #include "Controller/RenderController.h"
 #include "Controller/LevelController.h"
 #include "Controller/PhysicsController.h"
+#include "opengl/Skybox.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -46,7 +47,6 @@ int main() {
     loadResources();
     initControllers();
 
-
     while (!glfwWindowShouldClose(window)) {
 
         float currentFrame = glfwGetTime();
@@ -67,8 +67,6 @@ int main() {
         glfwPollEvents();
     }
 
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
 }
@@ -154,6 +152,8 @@ void loadModels() {
 
 void loadShaders() {
     auto basic = new Shader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
-
     ShaderManager::getManager().addShader("basic", basic);
+
+    auto skybox = new Shader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
+    ShaderManager::getManager().addShader("skybox", skybox);
 }

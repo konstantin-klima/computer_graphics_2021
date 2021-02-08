@@ -14,11 +14,15 @@ void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorl
     arena->addComponent<RigidBodyComponent>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, world, true);
     arena->addComponent<ConcaveColliderComponent>(arena->getComponent<ModelComponent>()->getMeshes(), physicsCommon);
     arena->getComponent<RigidBodyComponent>()->addCollider(arena->getComponent<ConcaveColliderComponent>()->getShape());
-    auto arenaShader = ShaderComponent();
-    arenaShader.addShader("basic", ShaderManager::getManager().getShader("basic"));
+    auto arenaShader = ShaderComponent(ShaderManager::getManager().getShader("basic"));
     arena->addComponent<ShaderComponent>(arenaShader);
     EntityManager::getManager().addEntity(arena);
 
+    auto skybox = new Entity();
+    skybox->addComponent<SkyboxComponent>();
+    auto skyboxShader = ShaderComponent(ShaderManager::getManager().getShader("skybox"));
+    skybox->addComponent<ShaderComponent>(skyboxShader);
+    EntityManager::getManager().addEntity(skybox);
 
     auto light = new Entity();
     auto lc = LightComponent(
