@@ -28,8 +28,8 @@ private:
     inline static const float timeStep = 1 / 60.0f;
     inline static rp3d::PhysicsCommon *physicsCommon;
     inline static rp3d::PhysicsWorld *world;
-    inline static float previousTime;
-    inline static float accumulator;
+    inline static long double previousTime;
+    inline static long double accumulator;
 };
 
 #endif //PROJECT_BASE_PHYSICSCONTROLLER_H

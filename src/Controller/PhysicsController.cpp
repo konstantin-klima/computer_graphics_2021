@@ -27,8 +27,8 @@ void PhysicsController::init() {
 }
 
 void PhysicsController::update() {
-    float currentTime = glfwGetTime();
-    float deltaTime = currentTime - previousTime;
+    long double currentTime = glfwGetTime();
+    long double deltaTime = currentTime - previousTime;
     previousTime = currentTime;
 
     accumulator += deltaTime;
