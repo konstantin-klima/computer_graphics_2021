@@ -20,6 +20,7 @@ struct PlayerController {
     static void update();
     static void processInput(GLFWwindow *window);
 
+    static void processMouse(float xoffset, float yoffset);
 };
 
 

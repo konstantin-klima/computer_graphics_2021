@@ -81,6 +81,10 @@ struct CameraComponent : public Component {
         camera.Position = pos;
     }
 
+    void updateCameraVectors(float xoffset, float yoffset){
+        camera.ProcessMouseMovement(xoffset, yoffset);
+    }
+
     glm::mat4 getViewMatrix() {
         return camera.GetViewMatrix();
     }
@@ -251,27 +255,26 @@ private:
 
 struct MovementComponent : public Component {
     MovementComponent(float dirx, float diry, float dirz, float speed)
-            : direction(new rp3d::Vector3(dirx, diry, dirz)), speed(speed) {};
+            : direction(rp3d::Vector3(dirx, diry, dirz)), speed(speed) {};
 
-    explicit MovementComponent(rp3d::Vector3 *dir, float speed) : direction(new rp3d::Vector3(dir->x, dir->y, dir->z)),
+    explicit MovementComponent(rp3d::Vector3 *dir, float speed) : direction(rp3d::Vector3(dir->x, dir->y, dir->z)),
                                                                   speed(speed) {};
 
     explicit MovementComponent(glm::vec3 *dir, float speed)
-            : direction(new rp3d::Vector3(dir->x, dir->y, dir->z)), speed(speed) {};
+            : direction(rp3d::Vector3(dir->x, dir->y, dir->z)), speed(speed) {};
 
     rp3d::Vector3 getDirection() const {
-        return *
-                direction;
+        return direction;
     }
 
-    glm::vec3 *getGLMVDirection() const {
-        return new glm::vec3(direction->x, direction->y, direction->z);
+    glm::vec3 getGLMVDirection() const {
+        return glm::vec3(direction.x, direction.y, direction.z);
     }
 
     void setDirection(rp3d::Vector3 *dir) {
-        direction->x = dir->x;
-        direction->y = dir->y;
-        direction->z = dir->z;
+        direction.x = dir->x;
+        direction.y = dir->y;
+        direction.z = dir->z;
     }
 
     float getSpeed() const {
@@ -280,14 +283,14 @@ struct MovementComponent : public Component {
 
     void setVelocity(rp3d::Vector3 *vel) {
         speed = vel->length();
-        direction->x = vel->x / speed;
-        direction->y = vel->y / speed;
-        direction->z = vel->z / speed;
+        direction.x = vel->x / speed;
+        direction.y = vel->y / speed;
+        direction.z = vel->z / speed;
     }
 
 
 private:
-    rp3d::Vector3 *direction;
+    rp3d::Vector3 direction;
     float speed;
 };
 

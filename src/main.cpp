@@ -24,7 +24,7 @@
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-//void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 GLFWwindow *setupWindow();
 void loadResources();
@@ -33,7 +33,7 @@ void loadShaders();
 void initControllers();
 
 
-float lastX = Settings::SCR_WIDTH / 2.0f;
+float lastX = Settings::SCR_WIDTH / 4.0f;
 float lastY = Settings::SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
@@ -82,7 +82,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
-/*
+
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     if (firstMouse) {
         lastX = xpos;
@@ -95,11 +95,9 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 
     lastX = xpos;
     lastY = ypos;
-
-    if (programState->CameraMouseMovementUpdateEnabled)
-        programState->camera.ProcessMouseMovement(xoffset, yoffset);
+    PlayerController::processMouse(xoffset, yoffset);
 }
- */
+
 
 GLFWwindow *setupWindow() {
     // glfw: initialize and configure
@@ -121,8 +119,8 @@ GLFWwindow *setupWindow() {
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    //glfwSetCursorPosCallback(window, mouse_callback);
-//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;

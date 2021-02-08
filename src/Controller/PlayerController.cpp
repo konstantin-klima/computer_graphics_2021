@@ -21,6 +21,7 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     auto p1Body = player1->getComponent<RigidBodyComponent>();
     p1Body->setMass(100.0f);
     p1Body->addCollider(player1->getComponent<BoxColliderComponent>()->getShape());
+    //p1Body->getRigidBody()->getCollider(0)->getMaterial().setFrictionCoefficient(0.0f);
     EntityManager::getManager().addEntity(player1);
 
     auto player2 = new Entity();
@@ -95,4 +96,19 @@ void PlayerController::processInput(GLFWwindow *window) {
             movement->setDirection(&direction);
         }
     }
+}
+
+void PlayerController::processMouse(float xoffset, float yoffset) {
+    float MouseSensitivity = 1.0;
+
+    xoffset *= MouseSensitivity;
+    yoffset *= MouseSensitivity;
+    auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
+    for(auto player : players) {
+        auto camera = player->getComponent<CameraComponent>();
+        if (camera->camIndex == 0) {
+            camera->updateCameraVectors(xoffset, yoffset);
+        }
+    }
+
 }
