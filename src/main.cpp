@@ -13,18 +13,14 @@
 #include "constants.h"
 
 #include <iostream>
-#include "Entity/EntityManager.h"
 #include "Entity/ModelManager.h"
 #include "Entity/ShaderManager.h"
-#include "reactphysics3d/reactphysics3d.h"
 #include "Controller/PlayerController.h"
 #include "Controller/RenderController.h"
 #include "Controller/LevelController.h"
 #include "Controller/PhysicsController.h"
-#include "opengl/Skybox.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 GLFWwindow *setupWindow();
@@ -38,7 +34,6 @@ float lastX = Settings::SCR_WIDTH / 4.0f;
 float lastY = Settings::SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-// timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -71,35 +66,7 @@ int main() {
     return 0;
 }
 
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
-
-// glfw: whenever the mouse moves, this callback is called
-// -------------------------------------------------------
-
-void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-    if (firstMouse) {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-    PlayerController::processMouse(xoffset, yoffset);
-}
-
-
 GLFWwindow *setupWindow() {
-    // glfw: initialize and configure
-    // ------------------------------
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -156,4 +123,23 @@ void loadShaders() {
 
     auto skybox = new Shader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
     ShaderManager::getManager().addShader("skybox", skybox);
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+    PlayerController::processMouse(xoffset, yoffset);
 }
