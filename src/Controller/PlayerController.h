@@ -11,7 +11,14 @@
 #include <GLFW/glfw3.h>
 
 #include "reactphysics3d/reactphysics3d.h"
+#include "../constants.h"
+
 #endif
+
+#include "SpellFactory.h"
+
+struct Entity;
+
 
 struct PlayerController {
     inline static bool initialized = false;
@@ -21,6 +28,14 @@ struct PlayerController {
     static void processInput(GLFWwindow *window);
 
     static void processMouse(float xoffset, float yoffset);
+
+private:
+    static void castSpell(Entity* player, SPELL spell);
+
+    inline static unsigned p1_lastKeyState_1 = 0;
+    inline static unsigned p1_lastKeyState_2 = 0;
+    inline static unsigned p1_lastKeyState_3 = 0;
+    inline static unsigned p1_lastKeyState_4 = 0;
 };
 
 

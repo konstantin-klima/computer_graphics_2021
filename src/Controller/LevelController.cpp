@@ -23,7 +23,7 @@ void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorl
     auto skyboxShader = ShaderComponent(ShaderManager::getManager().getShader("skybox"));
     skybox->addComponent<ShaderComponent>(skyboxShader);
     EntityManager::getManager().addEntity(skybox);
-
+/*
     auto light = new Entity();
     auto lc = LightComponent(
             glm::vec3(4.0f, 4.0, 0.0),
@@ -36,7 +36,7 @@ void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorl
     );
     light->addComponent<LightComponent>(lc);
 
-    EntityManager::getManager().addEntity(light);
+    EntityManager::getManager().addEntity(light); */
 }
 
 void LevelController::update() {
