@@ -45,7 +45,7 @@ include_directories(${CMAKE_BINARY_DIR}/configuration)
 include_directories(include/)
 add_executable(${PROJECT_NAME}
 
-        ${SOURCES} include/ConcaveCollider.h src/Entity/Entity.cpp src/Entity/Entity.h src/Entity/Component.h src/Entity/EntityManager.cpp src/Entity/EntityManager.h src/Controller/PlayerController.cpp src/Controller/PlayerController.h src/Controller/RenderController.cpp src/Controller/RenderController.h src/Entity/ShaderManager.h src/constants.h include/common.cpp include/learnopengl/model.cpp include/learnopengl/model.h src/Controller/PhysicsController.h src/Controller/PhysicsController.cpp src/Controller/LevelController.cpp src/Controller/LevelController.h src/opengl/Skybox.cpp src/opengl/Skybox.h)
+        ${SOURCES} include/ConcaveCollider.h src/Entity/Entity.cpp src/Entity/Entity.h src/Entity/Component.h src/Entity/EntityManager.cpp src/Entity/EntityManager.h src/Controller/PlayerController.cpp src/Controller/PlayerController.h src/Controller/RenderController.cpp src/Controller/RenderController.h src/Entity/ShaderManager.h src/constants.h include/common.cpp include/learnopengl/model.cpp include/learnopengl/model.h src/Controller/PhysicsController.h src/Controller/PhysicsController.cpp src/Controller/LevelController.cpp src/Controller/LevelController.h src/opengl/Skybox.cpp src/opengl/Skybox.h src/Controller/SpellFactory.cpp src/Controller/SpellFactory.h)
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 

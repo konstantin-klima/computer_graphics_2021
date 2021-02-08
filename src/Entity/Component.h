@@ -15,7 +15,7 @@
 #include "reactphysics3d/reactphysics3d.h"
 
 #include <iostream>
-
+#include "../constants.h"
 #include "ConcaveCollider.h"
 
 // Base component code adapted from Nikola Sobajic
@@ -289,7 +289,6 @@ private:
     rp3d::Vector3 direction;
     float speed;
 };
-
 
 enum SPELL_TYPES {
     BULLET,
