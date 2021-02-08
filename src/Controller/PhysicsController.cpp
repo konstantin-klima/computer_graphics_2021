@@ -1,0 +1,46 @@
+//
+// Created by rentorious on 03/02/2021.
+//
+
+//
+// Created by konstantin on 03/02/2021.
+//
+
+#include <GLFW/glfw3.h>
+
+#include "PhysicsController.h"
+
+#include "reactphysics3d/reactphysics3d.h"
+#include <iostream>
+
+void PhysicsController::init() {
+    if (initialized) {
+        return;
+    }
+
+    physicsCommon = new rp3d::PhysicsCommon;
+    world = physicsCommon->createPhysicsWorld();
+    previousTime = 0;
+    accumulator = 0;
+
+    initialized = true;
+}
+
+void PhysicsController::update() {
+    long double currentTime = glfwGetTime();
+    long double deltaTime = currentTime - previousTime;
+    previousTime = currentTime;
+
+    accumulator += deltaTime;
+
+
+    while (accumulator >= timeStep) {
+        world->update(timeStep);
+        accumulator -= timeStep;
+    }
+
+    // TODO: add interpolation
+
+//    float factor = accumulator / timeStep;
+
+}
