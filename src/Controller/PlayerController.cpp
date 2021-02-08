@@ -46,7 +46,7 @@ void PlayerController::update() {
         auto camera = player->getComponent<CameraComponent>();
 
         auto dir = movement->getDirection();
-        auto speed = movement->getSpeed();
+        auto speed = movement->getSpeed()*10;
 
         body->applyForceAtCenter(dir * speed);
         camera->setCameraPos(body->getGLMPosition());

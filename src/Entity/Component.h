@@ -10,6 +10,7 @@
 #include <learnopengl/camera.h>
 #include <learnopengl/shader.h>
 #include <learnopengl/model.h>
+#include "../opengl/Skybox.h"
 
 #include "reactphysics3d/reactphysics3d.h"
 
@@ -94,40 +95,14 @@ struct CameraComponent : public Component {
 };
 
 struct ShaderComponent : public Component {
-    std::unordered_map<std::string, Shader *> shaders;
+    Shader * shader;
 
-    ShaderComponent() = default;
+    explicit ShaderComponent(Shader *s) :shader(s){};
 
-    void addShader(const std::string &name, Shader *s) {
-        shaders[name] = s;
+    Shader *getShader() const {
+        return shader;
     }
 
-    void removeShader(const std::string &name) {
-        auto s = shaders.find(name);
-        if (s != shaders.end()) {
-            shaders.erase(s);
-        }
-    }
-
-    Shader *getShader(const std::string &name) const {
-        auto it = shaders.find(name);
-        if (it != shaders.end())
-            return it->second;
-        else {
-            return nullptr;
-        }
-
-
-    }
-
-    std::vector<Shader *> getAllShaders() const {
-        std::vector<Shader *> res;
-        for (const auto &it : shaders) {
-            res.push_back(it.second);
-        }
-
-        return res;
-    }
 };
 
 struct ModelComponent : public Component {
@@ -147,6 +122,23 @@ struct ModelComponent : public Component {
 
 private:
     Model *model;
+};
+
+struct SkyboxComponent : public Component {
+    SkyboxComponent() {
+        skybox = Skybox();
+    };
+
+    void setModel(Skybox skybox) {
+        this->skybox = skybox;
+    }
+
+    Skybox getSkybox() const {
+        return skybox;
+    }
+
+private:
+    Skybox skybox;
 };
 
 struct RigidBodyComponent : public Component {
@@ -231,7 +223,7 @@ struct RigidBodyComponent : public Component {
     }
 
     rp3d::Vector3 getLinearVelocity() const {
-        body->getLinearVelocity();
+        return body->getLinearVelocity();
     }
 
     void applyForceAtCenter(rp3d::Vector3 force) {

@@ -3,6 +3,7 @@
 //
 
 #include "RenderController.h"
+#include <assert.h>
 
 void RenderController::init() {
     loadShaders();
@@ -70,12 +71,13 @@ void RenderController::drawEntities() {
 
             if (entity == player)
                 continue;
-            auto shaderp = entity->getComponent<ShaderComponent>();
+            auto shaderComponent = entity->getComponent<ShaderComponent>();
             auto model = entity->getComponent<ModelComponent>()->getModel();
-            auto shader = shaderp->getShader("basic");
+
+            auto shader = shaderComponent->getShader();
 
             if(shader){
-
+                shader->use();
                 shader->setVec3("viewPosition", cameraComponent->camera.Position);
                 glm::mat4 projection = glm::perspective(glm::radians(cameraComponent->camera.Zoom),
                                                         (float) Settings::SCR_WIDTH / (float) Settings::SCR_HEIGHT, 0.1f, 100.0f);
@@ -88,8 +90,32 @@ void RenderController::drawEntities() {
                 shader->setMat4("model", modelMatrix);
                 model->Draw(*shader);
             }
-
         }
+
+        auto skyboxes = EntityManager::getManager().getEntitiesWithComponent<SkyboxComponent>();
+        if(skyboxes.size()) {
+            assert(skyboxes.size() <= 1);
+            auto skybox = skyboxes[0];
+            auto shaderComponent = skybox->getComponent<ShaderComponent>();
+            auto shader = shaderComponent->getShader();
+
+            shader->use();
+            shader->setVec3("viewPosition", cameraComponent->camera.Position);
+            glm::mat4 projection = glm::perspective(glm::radians(cameraComponent->camera.Zoom),
+                                                    (float) Settings::SCR_WIDTH / (float) Settings::SCR_HEIGHT, 0.1f,
+                                                    100.0f);
+
+            auto view = glm::mat4(glm::mat3(cameraComponent->getViewMatrix())); // remove translation from the view matrix
+            shader->setMat4("viewMatrix", view);
+            shader->setMat4("projectionMatrix", projection);
+            shader->setVec3("ambientLight", 0.4f, 0.1f, 0.1f);
+
+
+            auto skyboxModel = skybox->getComponent<SkyboxComponent>()->getSkybox();
+            skyboxModel.Draw(*shader);
+        }
+
+
     }
 
 }
