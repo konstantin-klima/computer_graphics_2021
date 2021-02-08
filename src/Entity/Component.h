@@ -77,7 +77,6 @@ struct CameraComponent : public Component {
 
     Camera camera;
 
-
     void setCameraPos(glm::vec3 pos) {
         camera.Position = pos;
     }
@@ -88,6 +87,11 @@ struct CameraComponent : public Component {
 
     glm::mat4 getViewMatrix() {
         return camera.GetViewMatrix();
+    }
+
+    [[nodiscard]]
+    glm::vec3 getCameraFront() const{
+        return camera.Front;
     }
 
     unsigned camIndex;
