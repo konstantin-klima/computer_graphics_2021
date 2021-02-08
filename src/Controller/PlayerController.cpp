@@ -64,37 +64,35 @@ void PlayerController::processInput(GLFWwindow *window) {
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
     for (auto player : players) {
         if (player->getComponent<CameraComponent>()->camIndex == 0) {
-            auto direction = new rp3d::Vector3(0, 0, 0);
+            auto direction = rp3d::Vector3(0, 0, 0);
 
             if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-                (*direction).z += -1;
+                direction.z += -1;
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-                (*direction).z += 1;
+                direction.z += 1;
             if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-                (*direction).x += -1;
+                direction.x += -1;
             if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-                (*direction).x += 1;
+                direction.x += 1;
 
-            direction->normalize();
+            direction.normalize();
             auto movement = player->getComponent<MovementComponent>();
-            movement->setDirection(direction);
+            movement->setDirection(&direction);
         } else {
-            auto direction = new rp3d::Vector3(0, 0, 0);
+            auto direction = rp3d::Vector3(0, 0, 0);
 
             if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-                (*direction).z += -1;
+                direction.z += -1;
             if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-                (*direction).z += 1;
+                direction.z += 1;
             if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-                (*direction).x += -1;
+                direction.x += -1;
             if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-                (*direction).x += 1;
+                direction.x += 1;
 
-            direction->normalize();
+            direction.normalize();
             auto movement = player->getComponent<MovementComponent>();
-            movement->setDirection(direction);
+            movement->setDirection(&direction);
         }
     }
-
-
 }
