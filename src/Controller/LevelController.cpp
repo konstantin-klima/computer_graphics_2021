@@ -14,6 +14,9 @@ void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorl
     arena->addComponent<RigidBodyComponent>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, world, true);
     arena->addComponent<ConcaveColliderComponent>(arena->getComponent<ModelComponent>()->getMeshes(), physicsCommon);
     arena->getComponent<RigidBodyComponent>()->addCollider(arena->getComponent<ConcaveColliderComponent>()->getShape());
+    arena->getComponent<RigidBodyComponent>()->getRigidBody()->getCollider(0)->getMaterial().setFrictionCoefficient(1.0f);
+    arena->getComponent<RigidBodyComponent>()->getRigidBody()->getCollider(0)->getMaterial().setBounciness(0.0f);
+
     auto arenaShader = ShaderComponent();
     arenaShader.addShader("basic", ShaderManager::getManager().getShader("basic"));
     arena->addComponent<ShaderComponent>(arenaShader);

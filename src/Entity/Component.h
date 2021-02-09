@@ -249,6 +249,44 @@ private:
     rp3d::Transform prevTransform;
 };
 
+struct CollisionBodyComponent : public Component {
+    CollisionBodyComponent(float x, float y, float z, float yaw, float pitch, rp3d::PhysicsWorld *world) {
+        auto pos = rp3d::Vector3(x, y, z);
+        auto orientation = rp3d::Quaternion::fromEulerAngles(yaw, pitch, 0);
+        auto transform = rp3d::Transform(pos, orientation);
+//        prevTransform = transform;
+        body = world->createCollisionBody(transform);
+    }
+
+    CollisionBodyComponent(float x, float y, float z, rp3d::PhysicsWorld *world) {
+        auto pos = rp3d::Vector3(x, y, z);
+        auto orientation = rp3d::Quaternion::identity();
+        transform = rp3d::Transform(pos, orientation);
+        body = world->createCollisionBody(transform);
+    }
+
+    rp3d::CollisionBody* getBody() const {
+        return this->body;
+    }
+
+    void setPosition(rp3d::Vector3 &newPos) {
+        transform.setPosition(newPos);
+        body->setTransform(transform);
+    }
+
+    rp3d::Vector3 getPosition() {
+        return transform.getPosition();
+    }
+
+    rp3d::Collider *addCollider(rp3d::CollisionShape *shape) {
+        return body->addCollider(shape, rp3d::Transform::identity());
+    }
+
+private:
+    rp3d::Transform transform;
+    rp3d::CollisionBody *body;
+};
+
 struct MovementComponent : public Component {
     MovementComponent(float dirx, float diry, float dirz, float speed)
             : direction(new rp3d::Vector3(dirx, diry, dirz)), speed(speed) {};
@@ -285,6 +323,11 @@ struct MovementComponent : public Component {
         direction->z = vel->z / speed;
     }
 
+    void moveCollisionBody(CollisionBodyComponent *body, long double deltaTime) {
+        rp3d::Vector3 pos = body->getPosition();
+        pos += *direction * speed * deltaTime;
+        body->setPosition(pos);
+    }
 
 private:
     rp3d::Vector3 *direction;

@@ -16,21 +16,19 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     auto player1 = new Entity();
     player1->addComponent<CameraComponent>(10, 10, 0, 0);
     player1->addComponent<MovementComponent>(0, 0, 0, 20.0f);
-    player1->addComponent<BoxColliderComponent>(0.3, 1, 0.3, physicsCommon);
-    player1->addComponent<RigidBodyComponent>(10, 20, 0, 0, -99.0f, world);
-    auto p1Body = player1->getComponent<RigidBodyComponent>();
-    p1Body->setMass(100.0f);
-    p1Body->addCollider(player1->getComponent<BoxColliderComponent>()->getShape());
+    player1->addComponent<CapsuleColliderComponent>(0.3, 2.0, physicsCommon);
+    player1->addComponent<CollisionBodyComponent>(10, 10, 0, world);
+    auto p1Body = player1->getComponent<CollisionBodyComponent>();
+    p1Body->addCollider(player1->getComponent<CapsuleColliderComponent>()->getShape());
     EntityManager::getManager().addEntity(player1);
 
     auto player2 = new Entity();
     player2->addComponent<CameraComponent>(-10, 10, 0, 1);
     player2->addComponent<MovementComponent>(0, 0, 0, 20.0f);
-    player2->addComponent<BoxColliderComponent>(0.3, 1, 0.3, physicsCommon);
-    player2->addComponent<RigidBodyComponent>(-20, 20, 0, 0, -99.0f, world);
-    auto p2Body = player2->getComponent<RigidBodyComponent>();
-    p2Body->setMass(100.0f);
-    p2Body->addCollider(player2->getComponent<BoxColliderComponent>()->getShape());
+    player2->addComponent<CapsuleColliderComponent>(0.3, 2.0, physicsCommon);
+    player2->addComponent<CollisionBodyComponent>(-10, 10, 0, world);
+    auto p2Body = player2->getComponent<CollisionBodyComponent>();
+    p2Body->addCollider(player2->getComponent<CapsuleColliderComponent>()->getShape());
     EntityManager::getManager().addEntity(player2);
 
     initialized = true;
@@ -40,16 +38,10 @@ void PlayerController::update() {
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
 
     for (auto player : players) {
-        auto body = player->getComponent<RigidBodyComponent>();
-        auto movement = player->getComponent<MovementComponent>();
-        auto camera = player->getComponent<CameraComponent>();
-
-        auto dir = movement->getDirection();
-        auto speed = movement->getSpeed();
-
-        body->applyForceAtCenter(dir * speed);
-        camera->setCameraPos(body->getGLMPosition());
-
+        auto body = player->getComponent<CollisionBodyComponent>();
+        player->getComponent<MovementComponent>()->moveCollisionBody(body, PhysicsController::getDeltaTime());
+        auto newPos = body->getPosition();
+        player->getComponent<CameraComponent>()->setCameraPos(glm::vec3(newPos.x, newPos.y, newPos.z));
     }
 
 }

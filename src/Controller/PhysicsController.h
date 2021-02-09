@@ -22,6 +22,10 @@ struct PhysicsController {
         return world;
     }
 
+    static long double getDeltaTime() {
+        return deltaTime;
+    }
+
 private:
     inline static bool initialized = false;
     // zasto mora inline???
@@ -30,6 +34,7 @@ private:
     inline static rp3d::PhysicsWorld *world;
     inline static long double previousTime;
     inline static long double accumulator;
+    inline static long double deltaTime = 0;
 };
 
 #endif //PROJECT_BASE_PHYSICSCONTROLLER_H
