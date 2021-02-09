@@ -118,7 +118,7 @@ void loadModels() {
 }
 
 void loadShaders() {
-    auto basic = new Shader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
+    auto basic = new Shader("resources/shaders/basic.vs", "resources/shaders/basic.fs");
     ShaderManager::getManager().addShader("basic", basic);
 
     auto skybox = new Shader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");

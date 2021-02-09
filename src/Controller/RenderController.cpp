@@ -26,28 +26,51 @@ void RenderController::updateLights() {
 
     for(auto shader : shaders){
         shader->use();
-        auto pls = EntityManager::getManager().getAllComponents<LightComponent>();
-        if(pls.size() == 0)
-            continue;
+        shader->setFloat("material.shininess", 32.0f);
 
-        auto pointLight = pls[0];
+        unsigned pointLightNo = 0;
+        unsigned spotlightNo = 0;
+
         for(const auto& light : lights){
-            if(light->type == LIGHTS::SPECULAR){
-                shader->setVec3("pointLight.position", pointLight->position);
-                shader->setVec3("pointLight.ambient", pointLight->ambient);
-                shader->setVec3("pointLight.diffuse", pointLight->diffuse);
-                shader->setVec3("pointLight.specular", pointLight->specular);
-                shader->setFloat("pointLight.constant", pointLight->constant);
-                shader->setFloat("pointLight.linear", pointLight->linear);
-                shader->setFloat("pointLight.quadratic", pointLight->quadratic);
-                shader->setFloat("material.shininess", 32.0f);
+            if(light->type == LIGHTS::POINT){
+                
+                std::ostringstream stream;
+                stream << "pointLights[" << pointLightNo << "].";
+                std::string prefix = stream.str();
+                
+                shader->setVec3(prefix + "position", light->position);
+                shader->setVec3(prefix + "ambient", light->ambient);
+                shader->setVec3(prefix + "diffuse", light->diffuse);
+                shader->setVec3(prefix + "specular", light->specular);
+                shader->setFloat(prefix + "constant", light->constant);
+                shader->setFloat(prefix + "linear", light->linear);
+                shader->setFloat(prefix + "quadratic", light->quadratic);
+
+                pointLightNo++;
             }
             else if(light->type == LIGHTS::SPOTLIGHT){
 
             }
+            else if(light->type == LIGHTS::DIRECT){
+                shader->setVec3("directLight.direction", light->direction);
+                shader->setVec3("directLight.ambient", light->direction);
+                shader->setVec3("directLight.diffuse", light->direction);
+                shader->setVec3("directLight.specular", light->direction);
+            }
         }
+
+        shader->setInt("pointLightNo", pointLightNo);
     }
 
+}
+
+void RenderController::updateShaderView(Camera c) {
+    auto shaders = ShaderManager::getManager().getAllShaders();
+
+    for(auto shader : shaders) {
+        shader->use();
+        shader->setVec3("viewPosition", c.Position);
+    }
 }
 
 void RenderController::clearGlBuffers(){
@@ -63,6 +86,7 @@ void RenderController::drawEntities() {
     for(const auto player : players) {
 
         auto cameraComponent = player->getComponent<CameraComponent>();
+        updateShaderView(cameraComponent->camera);
 
         glViewport(cameraComponent->camIndex * Settings::SCR_WIDTH * 0.5, 0, Settings::SCR_WIDTH * 0.5,
                    Settings::SCR_HEIGHT);

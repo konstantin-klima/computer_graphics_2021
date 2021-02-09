@@ -22,6 +22,8 @@ public:
     static void drawEntities();
 
     static void clearGlBuffers();
+private:
+    static void updateShaderView(Camera c);
 };
 
 
