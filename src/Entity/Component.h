@@ -15,7 +15,7 @@
 #include "reactphysics3d/reactphysics3d.h"
 
 #include <iostream>
-
+#include "../constants.h"
 #include "ConcaveCollider.h"
 
 // Base component code adapted from Nikola Sobajic
@@ -40,12 +40,13 @@ public:
 };
 
 enum LIGHTS {
-    SPECULAR,
+    DIRECT,
+    POINT,
     SPOTLIGHT
 };
 
 struct LightComponent : public Component {
-    LIGHTS type{SPECULAR};
+    LIGHTS type{POINT};
     glm::vec3 position;
 
     glm::vec3 ambient;
@@ -63,7 +64,16 @@ struct LightComponent : public Component {
     LightComponent(glm::vec3 &&position, glm::vec3 &&ambient, glm::vec3 &&diffuse, glm::vec3 &&specular, float constant,
                    float linear, float quadratic)
             : position(position), ambient(ambient), diffuse(diffuse), specular(specular), constant(constant),
-              linear(linear), quadratic(quadratic) {};
+              linear(linear), quadratic(quadratic)
+              {
+                  type = POINT;
+              };
+
+    LightComponent(glm::vec3 &&direction, glm::vec3 &&ambient, glm::vec3 &&diffuse, glm::vec3 &&specular)
+            : direction(direction), ambient(ambient), diffuse(diffuse), specular(specular)
+              {
+                  type = DIRECT;
+              }
 };
 
 struct CameraComponent : public Component {
@@ -77,7 +87,6 @@ struct CameraComponent : public Component {
 
     Camera camera;
 
-
     void setCameraPos(glm::vec3 pos) {
         camera.Position = pos;
     }
@@ -88,6 +97,11 @@ struct CameraComponent : public Component {
 
     glm::mat4 getViewMatrix() {
         return camera.GetViewMatrix();
+    }
+
+    [[nodiscard]]
+    glm::vec3 getCameraFront() const{
+        return camera.Front;
     }
 
     unsigned camIndex;
@@ -356,7 +370,6 @@ private:
     rp3d::Vector3 direction;
     float speed;
 };
-
 
 enum SPELL_TYPES {
     BULLET,

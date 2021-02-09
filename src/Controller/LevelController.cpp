@@ -29,13 +29,10 @@ void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorl
 
     auto light = new Entity();
     auto lc = LightComponent(
-            glm::vec3(4.0f, 4.0, 0.0),
-            glm::vec3(5, 5, 5),
-            glm::vec3(0.9, 0.9, 0.9),
-            glm::vec3(1.0, 1.0, 1.0),
-            1.0f,
-            0.09f,
-            0.032f
+            glm::vec3(-0.1f, -1.0f, -0.1),
+            glm::vec3(0.1f, 18.0f, 0.f),
+            glm::vec3(0, 20.f, 0.f),
+            glm::vec3(0, 20.f, 0.f)
     );
     light->addComponent<LightComponent>(lc);
 

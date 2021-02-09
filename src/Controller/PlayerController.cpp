@@ -71,6 +71,11 @@ void PlayerController::processInput(GLFWwindow *window) {
             if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
                 direction.x += 1;
 
+            auto p1_currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
+            if (p1_currentKeyState_1 == GLFW_RELEASE && p1_lastKeyState_1 == GLFW_PRESS)
+                castSpell(player, SPELL::FIREBALL);
+            p1_lastKeyState_1 = p1_currentKeyState_1;
+
             direction.normalize();
             auto movement = player->getComponent<MovementComponent>();
             movement->setDirection(&direction);
@@ -106,4 +111,16 @@ void PlayerController::processMouse(float xoffset, float yoffset) {
         }
     }
 
+}
+
+void PlayerController::castSpell(Entity *player, SPELL spell) {
+    // Do I have the spell inside my inventory?
+    // Is there an active cooldown?
+    // Which spell will I be casting?
+
+    // When these questions are answered call the SpellFactory.
+
+    // Make an Entity. It's inside EntityManager, the pointer is here for any additional changes
+    auto spellEntity = SpellFactory(player, spell).makeSpell();
+    std::cout << EntityManager::getManager().getAllComponents<LightComponent>().size() << std::endl;
 }
