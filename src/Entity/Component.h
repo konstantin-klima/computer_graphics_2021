@@ -345,7 +345,7 @@ struct MovementComponent : public Component {
 
     void moveCollisionBody(CollisionBodyComponent *body, long double deltaTime) {
         rp3d::Vector3 pos = body->getPosition();
-        pos += *direction * speed * deltaTime;
+        pos += direction * speed * deltaTime;
         if (body->affectedByGravity() && body->getIsFalling()) {
             pos += rp3d::Vector3(0, -9.81, 0) * deltaTime;
         }
