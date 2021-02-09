@@ -13,10 +13,8 @@
 #include "constants.h"
 
 #include <iostream>
-#include "Entity/EntityManager.h"
 #include "Entity/ModelManager.h"
 #include "Entity/ShaderManager.h"
-#include "reactphysics3d/reactphysics3d.h"
 #include "Controller/PlayerController.h"
 #include "Controller/RenderController.h"
 #include "Controller/LevelController.h"
@@ -53,10 +51,13 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+
         PhysicsController::update();
 
         PlayerController::processInput(window);
         PlayerController::update();
+
+
 
         glm::vec3 clearColor = glm::vec3(0);
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);

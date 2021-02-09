@@ -6,6 +6,7 @@
 #include "../Entity/EntityManager.h"
 #include "../Entity/ModelManager.h"
 #include "../Entity/ShaderManager.h"
+#include "../constants.h"
 
 void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorld *world) {
     // Arena setup
@@ -16,7 +17,9 @@ void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorl
     arena->getComponent<RigidBodyComponent>()->addCollider(arena->getComponent<ConcaveColliderComponent>()->getShape());
     auto arenaShader = ShaderComponent(ShaderManager::getManager().getShader("basic"));
     arena->addComponent<ShaderComponent>(arenaShader);
+    arena->getComponent<RigidBodyComponent>()->getRigidBody()->setUserData((void *)&"ARENA");
     EntityManager::getManager().addEntity(arena);
+
 
     auto skybox = new Entity();
     skybox->addComponent<SkyboxComponent>();
