@@ -6,6 +6,7 @@
 #include "../Entity/EntityManager.h"
 #include "../Entity/ModelManager.h"
 #include "../Entity/ShaderManager.h"
+#include "../constants.h"
 
 void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorld *world) {
     // Arena setup
@@ -14,8 +15,11 @@ void LevelController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorl
     arena->addComponent<RigidBodyComponent>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, world, true);
     arena->addComponent<ConcaveColliderComponent>(arena->getComponent<ModelComponent>()->getMeshes(), physicsCommon);
     arena->getComponent<RigidBodyComponent>()->addCollider(arena->getComponent<ConcaveColliderComponent>()->getShape());
-    arena->getComponent<RigidBodyComponent>()->getRigidBody()->getCollider(0)->getMaterial().setFrictionCoefficient(1.0f);
-    arena->getComponent<RigidBodyComponent>()->getRigidBody()->getCollider(0)->getMaterial().setBounciness(0.0f);
+//    arena->getComponent<RigidBodyComponent>()->getRigidBody()->getCollider(0)->setCollisionCategoryBits(Settings::CollisionCategory::ARENA);
+//    arena->getComponent<RigidBodyComponent>()->getRigidBody()->getCollider(0)->setCollideWithMaskBits(Settings::CollisionCategory::PLAYER);
+    arena->getComponent<RigidBodyComponent>()->getRigidBody()->setUserData((void *)&"ARENA");
+
+
 
     auto arenaShader = ShaderComponent();
     arenaShader.addShader("basic", ShaderManager::getManager().getShader("basic"));

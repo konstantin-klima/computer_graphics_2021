@@ -5,6 +5,7 @@
 #include "PlayerController.h"
 #include "../Entity/EntityManager.h"
 #include "PhysicsController.h"
+#include "../constants.h"
 
 #include <iostream>
 
@@ -15,20 +16,24 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
 
     auto player1 = new Entity();
     player1->addComponent<CameraComponent>(10, 10, 0, 0);
-    player1->addComponent<MovementComponent>(0, 0, 0, 20.0f);
-    player1->addComponent<CapsuleColliderComponent>(0.3, 2.0, physicsCommon);
-    player1->addComponent<CollisionBodyComponent>(10, 10, 0, world);
+    player1->addComponent<MovementComponent>(0, 0, 0, 15.0f);
+    player1->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
+    player1->addComponent<CollisionBodyComponent>(10, 20, 0, world);
     auto p1Body = player1->getComponent<CollisionBodyComponent>();
+    p1Body->getBody()->setUserData((void *)&"PLAYER1");
     p1Body->addCollider(player1->getComponent<CapsuleColliderComponent>()->getShape());
     EntityManager::getManager().addEntity(player1);
 
+
     auto player2 = new Entity();
-    player2->addComponent<CameraComponent>(-10, 10, 0, 1);
-    player2->addComponent<MovementComponent>(0, 0, 0, 20.0f);
-    player2->addComponent<CapsuleColliderComponent>(0.3, 2.0, physicsCommon);
-    player2->addComponent<CollisionBodyComponent>(-10, 10, 0, world);
+    player2->addComponent<CameraComponent>(-10, 10, -10, 1);
+    player2->addComponent<MovementComponent>(0, 0, 0, 15.0f);
+    player2->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
+    player2->addComponent<CollisionBodyComponent>(-10, 10, -10, world);
     auto p2Body = player2->getComponent<CollisionBodyComponent>();
+    p2Body->getBody()->setUserData((void *)&"PLAYER2");
     p2Body->addCollider(player2->getComponent<CapsuleColliderComponent>()->getShape());
+
     EntityManager::getManager().addEntity(player2);
 
     initialized = true;

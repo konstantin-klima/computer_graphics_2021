@@ -250,31 +250,41 @@ private:
 };
 
 struct CollisionBodyComponent : public Component {
-    CollisionBodyComponent(float x, float y, float z, float yaw, float pitch, rp3d::PhysicsWorld *world) {
+    CollisionBodyComponent(float x, float y, float z, float yaw, float pitch, rp3d::PhysicsWorld *world, bool gravity = true, bool isFalling = true) {
         auto pos = rp3d::Vector3(x, y, z);
         auto orientation = rp3d::Quaternion::fromEulerAngles(yaw, pitch, 0);
         auto transform = rp3d::Transform(pos, orientation);
 //        prevTransform = transform;
         body = world->createCollisionBody(transform);
+        this->gravity = gravity;
+        this->isFalling = isFalling;
+
     }
 
-    CollisionBodyComponent(float x, float y, float z, rp3d::PhysicsWorld *world) {
+    CollisionBodyComponent(float x, float y, float z, rp3d::PhysicsWorld *world, bool gravity = true, bool isFalling = true) {
         auto pos = rp3d::Vector3(x, y, z);
         auto orientation = rp3d::Quaternion::identity();
         transform = rp3d::Transform(pos, orientation);
+        prevTransform = transform;
         body = world->createCollisionBody(transform);
+        this->gravity = gravity;
+        this->isFalling = isFalling;
     }
 
-    rp3d::CollisionBody* getBody() const {
+    rp3d::CollisionBody *
+    getBody() const {
         return this->body;
     }
 
     void setPosition(rp3d::Vector3 &newPos) {
+        prevTransform = transform;
         transform.setPosition(newPos);
         body->setTransform(transform);
     }
 
     rp3d::Vector3 getPosition() {
+        prevTransform = transform;
+        transform = body->getTransform();
         return transform.getPosition();
     }
 
@@ -282,9 +292,24 @@ struct CollisionBodyComponent : public Component {
         return body->addCollider(shape, rp3d::Transform::identity());
     }
 
+    bool affectedByGravity() const {
+        return gravity;
+    }
+
+    bool getIsFalling() const {
+        return isFalling;
+    }
+
+    void setIsFalling(bool falling) {
+        isFalling = falling;
+    }
+
 private:
     rp3d::Transform transform;
+    rp3d::Transform prevTransform;
     rp3d::CollisionBody *body;
+    bool gravity;
+    bool isFalling;
 };
 
 struct MovementComponent : public Component {
@@ -326,6 +351,9 @@ struct MovementComponent : public Component {
     void moveCollisionBody(CollisionBodyComponent *body, long double deltaTime) {
         rp3d::Vector3 pos = body->getPosition();
         pos += *direction * speed * deltaTime;
+        if (body->affectedByGravity() && body->getIsFalling()) {
+            pos += rp3d::Vector3(0, -9.81, 0) * deltaTime;
+        }
         body->setPosition(pos);
     }
 
@@ -374,13 +402,7 @@ private:
     SPELL_TYPES type;
 };
 
-enum COLLIDER_TYPES {
-    BOX,
-    SPHERE,
-    CAPSULE,
-    CONCAVE,
-    CONVEX,
-};
+// Colliders
 
 struct CapsuleColliderComponent : public Component {
     CapsuleColliderComponent(float radius, float height, rp3d::PhysicsCommon *physicsCommon) {
@@ -416,6 +438,7 @@ struct ConcaveColliderComponent : public Component {
     rp3d::ConcaveMeshShape *getShape() const {
         return collider->getShape();
     }
+
 private:
     ConcaveCollider *collider;
 };

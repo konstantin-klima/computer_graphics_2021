@@ -6,6 +6,9 @@
 #define PROJECT_BASE_PHYSICSCONTROLLER_H
 
 #include "reactphysics3d/reactphysics3d.h"
+#include "EventListener.h"
+#include <chrono>
+
 
 struct PhysicsController {
     static void init();
@@ -22,8 +25,8 @@ struct PhysicsController {
         return world;
     }
 
-    static long double getDeltaTime() {
-        return deltaTime;
+    static double getDeltaTime() {
+        return deltaTime.count();
     }
 
 private:
@@ -32,9 +35,11 @@ private:
     inline static const float timeStep = 1 / 60.0f;
     inline static rp3d::PhysicsCommon *physicsCommon;
     inline static rp3d::PhysicsWorld *world;
-    inline static long double previousTime;
+    inline static std::chrono::system_clock::time_point previousTime;
+    inline static std::chrono::system_clock::time_point currentTime;
     inline static long double accumulator;
-    inline static long double deltaTime = 0;
+    inline static std::chrono::duration<double> deltaTime;
+    inline static EventListener *eventListener;
 };
 
 #endif //PROJECT_BASE_PHYSICSCONTROLLER_H
