@@ -9,8 +9,9 @@ struct Entity;
 struct Camera;
 
 enum SPELL {
-    FIREBALL,
-    BOLT
+    VOID_BOLT,
+    SPECTRAL_ARROW,
+    FROST_BOMB
 };
 
 class SpellFactory {
@@ -23,6 +24,10 @@ class SpellFactory {
     void makeLightComponent();
     void makeMovementComponent();
     void makeSpellPropertyComponent();
+    void makeShaderComponent();
+    void makeModelComponent();
+    void makeRigidBodyComponent();
+    void makeColliderComponent();
 
 public:
     SpellFactory(Entity* player, SPELL spell);

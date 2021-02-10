@@ -21,8 +21,8 @@ class EventListener : public rp3d::EventListener {
             auto c2 = contactPair.getCollider2();
 
 
-            std::string b1Name = (char *) b1->getUserData();
-            std::string b2Name = (char *) b2->getUserData();
+            std::string b1Name = b1->getUserData() ? (char *) b1->getUserData() : "";
+            std::string b2Name = b2->getUserData() ? (char *) b2->getUserData() : "";
 
             if ((b1Name == "ARENA" || b1Name == "PLAYER1" || b1Name == "PLAYER2") &&
                 (b2Name == "ARENA" || b2Name == "PLAYER1" || b2Name == "PLAYER2")) {

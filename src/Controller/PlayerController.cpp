@@ -20,7 +20,7 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     player1->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
     player1->addComponent<CollisionBodyComponent>(10, 10, 0, world);
     auto p1Body = player1->getComponent<CollisionBodyComponent>();
-    p1Body->getBody()->setUserData((void *)&"PLAYER1");
+    p1Body->getBody()->setUserData((void *) &"PLAYER1");
     p1Body->addCollider(player1->getComponent<CapsuleColliderComponent>()->getShape());
     EntityManager::getManager().addEntity(player1);
 
@@ -30,7 +30,7 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     player2->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
     player2->addComponent<CollisionBodyComponent>(-10, 10, -10, world);
     auto p2Body = player2->getComponent<CollisionBodyComponent>();
-    p2Body->getBody()->setUserData((void *)&"PLAYER2");
+    p2Body->getBody()->setUserData((void *) &"PLAYER2");
     p2Body->addCollider(player2->getComponent<CapsuleColliderComponent>()->getShape());
 
     EntityManager::getManager().addEntity(player2);
@@ -60,6 +60,10 @@ void PlayerController::processInput(GLFWwindow *window) {
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
     for (auto player : players) {
         auto forward = player->getComponent<CameraComponent>()->getRP3DFront();
+        forward.y = 0;
+        auto right = player->getComponent<CameraComponent>()->getRP3DRight();
+        right.y = 0;
+
         if (player->getComponent<CameraComponent>()->camIndex == 0) {
             auto direction = rp3d::Vector3(0, 0, 0);
 
@@ -68,13 +72,13 @@ void PlayerController::processInput(GLFWwindow *window) {
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
                 direction += -forward;
             if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-                direction.x += -1;
+                direction += -right;
             if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-                direction.x += 1;
+                direction += right;
 
             auto p1_currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
             if (p1_currentKeyState_1 == GLFW_RELEASE && p1_lastKeyState_1 == GLFW_PRESS)
-                castSpell(player, SPELL::FIREBALL);
+                castSpell(player, SPELL::FROST_BOMB);
             p1_lastKeyState_1 = p1_currentKeyState_1;
 
             direction.normalize();
@@ -88,9 +92,9 @@ void PlayerController::processInput(GLFWwindow *window) {
             if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
                 direction += -forward;
             if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-                direction.x += -1;
+                direction += -right;
             if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-                direction.x += 1;
+                direction += right;
 
             direction.normalize();
             auto movement = player->getComponent<MovementComponent>();
@@ -105,7 +109,7 @@ void PlayerController::processMouse(float xoffset, float yoffset) {
     xoffset *= MouseSensitivity;
     yoffset *= MouseSensitivity;
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
-    for(auto player : players) {
+    for (auto player : players) {
         auto camera = player->getComponent<CameraComponent>();
         if (camera->camIndex == 0) {
             camera->updateCameraVectors(xoffset, yoffset);

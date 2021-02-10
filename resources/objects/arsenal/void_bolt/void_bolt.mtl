@@ -10,7 +10,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:\\Users\\Rentorious\\Blender Projects\\Donut tutorial\\Saw.png
+map_Kd diffuse.png
 
 newmtl Material.002
 Ns 225.000000
@@ -21,7 +21,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:\\Users\\Rentorious\\Blender Projects\\Donut tutorial\\Void Bolt.png
+map_Kd diffuse.png
 
 newmtl Material.003
 Ns 225.000000
@@ -32,7 +32,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:\\Users\\Rentorious\\Blender Projects\\Donut tutorial\\ice bomb.png
+map_Kd diffuse.png
 
 newmtl Material.004
 Ns 225.000000
@@ -43,7 +43,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:\\Users\\Rentorious\\Blender Projects\\Donut tutorial\\Lightning.png
+map_Kd diffuse.png
 
 newmtl Material.005
 Ns 225.000000
@@ -54,7 +54,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:\\Users\\Rentorious\\Blender Projects\\Donut tutorial\\Spectral Bolt.png
+map_Kd diffuse.png
 
 newmtl Material.006
 Ns 225.000000
@@ -65,3 +65,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
+map_Kd diffuse.png
