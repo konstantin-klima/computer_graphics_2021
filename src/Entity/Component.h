@@ -64,16 +64,14 @@ struct LightComponent : public Component {
     LightComponent(glm::vec3 &&position, glm::vec3 &&ambient, glm::vec3 &&diffuse, glm::vec3 &&specular, float constant,
                    float linear, float quadratic)
             : position(position), ambient(ambient), diffuse(diffuse), specular(specular), constant(constant),
-              linear(linear), quadratic(quadratic)
-              {
-                  type = POINT;
-              };
+              linear(linear), quadratic(quadratic) {
+        type = POINT;
+    };
 
     LightComponent(glm::vec3 &&direction, glm::vec3 &&ambient, glm::vec3 &&diffuse, glm::vec3 &&specular)
-            : direction(direction), ambient(ambient), diffuse(diffuse), specular(specular)
-              {
-                  type = DIRECT;
-              }
+            : direction(direction), ambient(ambient), diffuse(diffuse), specular(specular) {
+        type = DIRECT;
+    }
 };
 
 struct CameraComponent : public Component {
@@ -91,7 +89,7 @@ struct CameraComponent : public Component {
         camera.Position = pos;
     }
 
-    void updateCameraVectors(float xoffset, float yoffset){
+    void updateCameraVectors(float xoffset, float yoffset) {
         camera.ProcessMouseMovement(xoffset, yoffset);
     }
 
@@ -100,7 +98,7 @@ struct CameraComponent : public Component {
     }
 
     [[nodiscard]]
-    glm::vec3 getCameraFront() const{
+    glm::vec3 getCameraFront() const {
         return camera.Front;
     }
 
@@ -117,9 +115,9 @@ struct CameraComponent : public Component {
 };
 
 struct ShaderComponent : public Component {
-    Shader * shader;
+    Shader *shader;
 
-    explicit ShaderComponent(Shader *s) :shader(s){};
+    explicit ShaderComponent(Shader *s) : shader(s) {};
 
     Shader *getShader() const {
         return shader;
@@ -187,10 +185,6 @@ struct RigidBodyComponent : public Component {
         return body->getMass();
     }
 
-    void setRigidBody(rp3d::RigidBody *body) {
-        this->body = body;
-    }
-
     rp3d::RigidBody *getRigidBody() const {
         return body;
     }
@@ -223,6 +217,12 @@ struct RigidBodyComponent : public Component {
     glm::mat4 getGLMTransform() const {
         float transform[16];
         body->getTransform().getOpenGLMatrix(transform);
+
+
+        for (float t : transform) {
+            std::cout << t << " ";
+        }
+        std::cout << std::endl;
 
         return glm::mat4({
                                  {transform[0],  transform[1],  transform[2],  transform[3]},
@@ -268,7 +268,8 @@ private:
 };
 
 struct CollisionBodyComponent : public Component {
-    CollisionBodyComponent(float x, float y, float z, float yaw, float pitch, rp3d::PhysicsWorld *world, bool gravity = true, bool isFalling = true) {
+    CollisionBodyComponent(float x, float y, float z, float yaw, float pitch, rp3d::PhysicsWorld *world,
+                           bool gravity = true, bool isFalling = true) {
         auto pos = rp3d::Vector3(x, y, z);
         auto orientation = rp3d::Quaternion::fromEulerAngles(yaw, pitch, 0);
         auto transform = rp3d::Transform(pos, orientation);
@@ -279,7 +280,8 @@ struct CollisionBodyComponent : public Component {
 
     }
 
-    CollisionBodyComponent(float x, float y, float z, rp3d::PhysicsWorld *world, bool gravity = true, bool isFalling = true) {
+    CollisionBodyComponent(float x, float y, float z, rp3d::PhysicsWorld *world, bool gravity = true,
+                           bool isFalling = true) {
         auto pos = rp3d::Vector3(x, y, z);
         auto orientation = rp3d::Quaternion::identity();
         transform = rp3d::Transform(pos, orientation);
@@ -320,6 +322,17 @@ struct CollisionBodyComponent : public Component {
 
     void setIsFalling(bool falling) {
         isFalling = falling;
+    }
+
+    glm::mat4 getGLMTransform() const {
+        float transformArr[16];
+
+        return glm::mat4({
+                                 {transformArr[0],  transformArr[1],  transformArr[2],  transformArr[3]},
+                                 {transformArr[4],  transformArr[5],  transformArr[6],  transformArr[7]},
+                                 {transformArr[8],  transformArr[9],  transformArr[10], transformArr[11]},
+                                 {transformArr[12], transformArr[13], transformArr[14], transformArr[15]}
+                         });
     }
 
 private:
@@ -444,6 +457,19 @@ struct BoxColliderComponent : public Component {
 
 private:
     rp3d::BoxShape *shape;
+};
+
+struct SphereColliderComponent : public Component {
+    SphereColliderComponent(float radius, rp3d::PhysicsCommon *physicsCommon) {
+        shape = physicsCommon->createSphereShape(radius);
+    }
+
+    rp3d::SphereShape *getShape() const {
+        return shape;
+    }
+
+private:
+    rp3d::SphereShape *shape;
 };
 
 struct ConcaveColliderComponent : public Component {

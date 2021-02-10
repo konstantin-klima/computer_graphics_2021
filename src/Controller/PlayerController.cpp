@@ -20,7 +20,7 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     player1->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
     player1->addComponent<CollisionBodyComponent>(10, 10, 0, world);
     auto p1Body = player1->getComponent<CollisionBodyComponent>();
-    p1Body->getBody()->setUserData((void *)&"PLAYER1");
+    p1Body->getBody()->setUserData((void *) &"PLAYER1");
     p1Body->addCollider(player1->getComponent<CapsuleColliderComponent>()->getShape());
     EntityManager::getManager().addEntity(player1);
 
@@ -30,7 +30,7 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     player2->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
     player2->addComponent<CollisionBodyComponent>(-10, 10, -10, world);
     auto p2Body = player2->getComponent<CollisionBodyComponent>();
-    p2Body->getBody()->setUserData((void *)&"PLAYER2");
+    p2Body->getBody()->setUserData((void *) &"PLAYER2");
     p2Body->addCollider(player2->getComponent<CapsuleColliderComponent>()->getShape());
 
     EntityManager::getManager().addEntity(player2);
@@ -78,7 +78,7 @@ void PlayerController::processInput(GLFWwindow *window) {
 
             auto p1_currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
             if (p1_currentKeyState_1 == GLFW_RELEASE && p1_lastKeyState_1 == GLFW_PRESS)
-                castSpell(player, SPELL::VOID_BOLT);
+                castSpell(player, SPELL::FROST_BOMB);
             p1_lastKeyState_1 = p1_currentKeyState_1;
 
             direction.normalize();
@@ -109,7 +109,7 @@ void PlayerController::processMouse(float xoffset, float yoffset) {
     xoffset *= MouseSensitivity;
     yoffset *= MouseSensitivity;
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
-    for(auto player : players) {
+    for (auto player : players) {
         auto camera = player->getComponent<CameraComponent>();
         if (camera->camIndex == 0) {
             camera->updateCameraVectors(xoffset, yoffset);

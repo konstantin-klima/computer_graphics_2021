@@ -116,8 +116,19 @@ void loadResources(){
 void loadModels() {
     auto arenaModel = new Model("resources/objects/arena/arena.obj");
     arenaModel->SetShaderTextureNamePrefix("material.");
-
     ModelManager::getManager().addModel("arena", arenaModel);
+
+    auto voidBoltModel = new Model("resources/objects/arsenal/void_bolt/void_bolt.obj");
+    voidBoltModel->SetShaderTextureNamePrefix("material.");
+    ModelManager::getManager().addModel("voidBolt", voidBoltModel);
+
+    auto spectralArrowModel = new Model("resources/objects/arsenal/spectral_arrow/spectral_arrow.obj");
+    spectralArrowModel->SetShaderTextureNamePrefix("material.");
+    ModelManager::getManager().addModel("spectralArrow", spectralArrowModel);
+
+    auto frostBombModel = new Model("resources/objects/arsenal/frost_bomb/frost_bomb.obj");
+    frostBombModel->SetShaderTextureNamePrefix("material.");
+    ModelManager::getManager().addModel("frostBomb", frostBombModel);
 }
 
 void loadShaders() {
