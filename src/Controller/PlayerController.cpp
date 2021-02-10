@@ -60,6 +60,10 @@ void PlayerController::processInput(GLFWwindow *window) {
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
     for (auto player : players) {
         auto forward = player->getComponent<CameraComponent>()->getRP3DFront();
+        forward.y = 0;
+        auto right = player->getComponent<CameraComponent>()->getRP3DRight();
+        right.y = 0;
+
         if (player->getComponent<CameraComponent>()->camIndex == 0) {
             auto direction = rp3d::Vector3(0, 0, 0);
 
@@ -68,13 +72,13 @@ void PlayerController::processInput(GLFWwindow *window) {
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
                 direction += -forward;
             if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-                direction.x += -1;
+                direction += -right;
             if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-                direction.x += 1;
+                direction += right;
 
             auto p1_currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
             if (p1_currentKeyState_1 == GLFW_RELEASE && p1_lastKeyState_1 == GLFW_PRESS)
-                castSpell(player, SPELL::FIREBALL);
+                castSpell(player, SPELL::VOID_BOLT);
             p1_lastKeyState_1 = p1_currentKeyState_1;
 
             direction.normalize();
@@ -88,9 +92,9 @@ void PlayerController::processInput(GLFWwindow *window) {
             if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
                 direction += -forward;
             if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-                direction.x += -1;
+                direction += -right;
             if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-                direction.x += 1;
+                direction += right;
 
             direction.normalize();
             auto movement = player->getComponent<MovementComponent>();

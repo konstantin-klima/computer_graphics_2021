@@ -108,6 +108,10 @@ struct CameraComponent : public Component {
         return rp3d::Vector3(camera.Front.x, camera.Front.y, camera.Front.z);
     }
 
+    rp3d::Vector3 getRP3DRight() const {
+        return rp3d::Vector3(camera.Right.x, camera.Right.y, camera.Right.z);
+    }
+
     unsigned camIndex;
 
 };
