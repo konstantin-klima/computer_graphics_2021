@@ -59,13 +59,14 @@ void PlayerController::processInput(GLFWwindow *window) {
 
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
     for (auto player : players) {
+        auto forward = player->getComponent<CameraComponent>()->getRP3DFront();
         if (player->getComponent<CameraComponent>()->camIndex == 0) {
             auto direction = rp3d::Vector3(0, 0, 0);
 
             if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-                direction.z += -1;
+                direction += forward;
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-                direction.z += 1;
+                direction += -forward;
             if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
                 direction.x += -1;
             if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
@@ -83,9 +84,9 @@ void PlayerController::processInput(GLFWwindow *window) {
             auto direction = rp3d::Vector3(0, 0, 0);
 
             if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-                direction.z += -1;
+                direction += forward;
             if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-                direction.z += 1;
+                direction += -forward;
             if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
                 direction.x += -1;
             if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
@@ -112,6 +113,7 @@ void PlayerController::processMouse(float xoffset, float yoffset) {
     }
 
 }
+
 
 void PlayerController::castSpell(Entity *player, SPELL spell) {
     // Do I have the spell inside my inventory?
