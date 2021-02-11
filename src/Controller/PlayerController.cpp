@@ -6,7 +6,7 @@
 #include "../Entity/EntityManager.h"
 #include "PhysicsController.h"
 #include "../constants.h"
-
+#include "../Entity/ShaderManager.h"
 #include <iostream>
 
 void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorld *world) {
@@ -18,7 +18,9 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     player1->addComponent<CameraComponent>(10, 10, 0, 0);
     player1->addComponent<MovementComponent>(0, 0, 0, 15.0f);
     player1->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
-    player1->addComponent<CollisionBodyComponent>(10, 10, 0, world);
+    player1->addComponent<CollisionBodyComponent>(10, 10, 0, world, false);
+    player1->addComponent<PlayerModelComponent>();
+    player1->addComponent<ShaderComponent>(ShaderManager::getManager().getShader("player"));
     auto p1Body = player1->getComponent<CollisionBodyComponent>();
     p1Body->getBody()->setUserData((void *) &"PLAYER1");
     p1Body->addCollider(player1->getComponent<CapsuleColliderComponent>()->getShape());
@@ -29,6 +31,8 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     player2->addComponent<MovementComponent>(0, 0, 0, 15.0f);
     player2->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
     player2->addComponent<CollisionBodyComponent>(-10, 10, -10, world);
+    player2->addComponent<PlayerModelComponent>();
+    player2->addComponent<ShaderComponent>(ShaderManager::getManager().getShader("player"));
     auto p2Body = player2->getComponent<CollisionBodyComponent>();
     p2Body->getBody()->setUserData((void *) &"PLAYER2");
     p2Body->addCollider(player2->getComponent<CapsuleColliderComponent>()->getShape());
@@ -75,6 +79,10 @@ void PlayerController::processInput(GLFWwindow *window) {
                 direction += -right;
             if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
                 direction += right;
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+                direction += rp3d::Vector3(0, 1, 0);
+            if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+                direction += rp3d::Vector3(0, -1, 0);
 
             auto p1_currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
             if (p1_currentKeyState_1 == GLFW_RELEASE && p1_lastKeyState_1 == GLFW_PRESS)

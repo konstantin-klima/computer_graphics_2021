@@ -137,6 +137,9 @@ void loadShaders() {
 
     auto skybox = new Shader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
     ShaderManager::getManager().addShader("skybox", skybox);
+
+    auto player = new Shader("resources/shaders/player.vs", "resources/shaders/player.fs");
+    ShaderManager::getManager().addShader("player", player);
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {

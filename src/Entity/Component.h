@@ -11,12 +11,14 @@
 #include <learnopengl/shader.h>
 #include <learnopengl/model.h>
 #include "../opengl/Skybox.h"
+#include "../opengl/PlayerModel.h"
 
 #include "reactphysics3d/reactphysics3d.h"
 
 #include <iostream>
 #include "../constants.h"
 #include "ConcaveCollider.h"
+
 
 // Base component code adapted from Nikola Sobajic
 typedef unsigned ComponentTypeID;
@@ -142,6 +144,22 @@ struct ModelComponent : public Component {
 
 private:
     Model *model;
+};
+
+struct PlayerModelComponent : public Component {
+    PlayerModelComponent() {
+        model = new PlayerModel();
+    }
+
+    PlayerModel* getModel() const {
+        return model;
+    }
+
+    void draw() {
+        model->draw();
+    }
+private:
+    PlayerModel *model;
 };
 
 struct SkyboxComponent : public Component {
@@ -317,8 +335,12 @@ struct CollisionBodyComponent : public Component {
         isFalling = falling;
     }
 
-    glm::mat4 getGLMTransform() const {
+    glm::mat4 getGLMTransform() {
         float transformArr[16];
+
+        transform = body->getTransform();
+
+        transform.getOpenGLMatrix(transformArr);
 
         return glm::mat4({
                                  {transformArr[0],  transformArr[1],  transformArr[2],  transformArr[3]},
