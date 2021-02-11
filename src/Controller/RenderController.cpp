@@ -104,7 +104,6 @@ void RenderController::drawEntities() {
                 continue;
             auto shaderComponent = entity->getComponent<ShaderComponent>();
             auto model = entity->getComponent<ModelComponent>()->getModel();
-            std::cout << model->directory << " ";
             Component *body = nullptr;
             if (entity->hasComponent<CollisionBodyComponent>())
                 body = entity->getComponent<CollisionBodyComponent>();
@@ -127,7 +126,6 @@ void RenderController::drawEntities() {
                 glm::mat4 modelMatrix;
                 if (body) {
                     modelMatrix = ((RigidBodyComponent *) body)->getGLMTransform();
-                    std::cout << ((RigidBodyComponent *)body)->getPosition().to_string() << std::endl;
                 } else
                     modelMatrix = glm::mat4(1.0f);
 

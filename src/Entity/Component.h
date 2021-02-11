@@ -217,13 +217,6 @@ struct RigidBodyComponent : public Component {
     glm::mat4 getGLMTransform() const {
         float transform[16];
         body->getTransform().getOpenGLMatrix(transform);
-
-
-        for (float t : transform) {
-            std::cout << t << " ";
-        }
-        std::cout << std::endl;
-
         return glm::mat4({
                                  {transform[0],  transform[1],  transform[2],  transform[3]},
                                  {transform[4],  transform[5],  transform[6],  transform[7]},
