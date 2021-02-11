@@ -11,12 +11,14 @@
 #include <learnopengl/shader.h>
 #include <learnopengl/model.h>
 #include "../opengl/Skybox.h"
+#include "../opengl/PlayerModel.h"
 
 #include "reactphysics3d/reactphysics3d.h"
 
 #include <iostream>
 #include "../constants.h"
 #include "ConcaveCollider.h"
+
 
 // Base component code adapted from Nikola Sobajic
 typedef unsigned ComponentTypeID;
@@ -144,6 +146,22 @@ private:
     Model *model;
 };
 
+struct PlayerModelComponent : public Component {
+    PlayerModelComponent() {
+        model = new PlayerModel();
+    }
+
+    PlayerModel* getModel() const {
+        return model;
+    }
+
+    void draw() {
+        model->draw();
+    }
+private:
+    PlayerModel *model;
+};
+
 struct SkyboxComponent : public Component {
     SkyboxComponent() {
         skybox = Skybox();
@@ -217,13 +235,6 @@ struct RigidBodyComponent : public Component {
     glm::mat4 getGLMTransform() const {
         float transform[16];
         body->getTransform().getOpenGLMatrix(transform);
-
-
-        for (float t : transform) {
-            std::cout << t << " ";
-        }
-        std::cout << std::endl;
-
         return glm::mat4({
                                  {transform[0],  transform[1],  transform[2],  transform[3]},
                                  {transform[4],  transform[5],  transform[6],  transform[7]},
@@ -324,8 +335,12 @@ struct CollisionBodyComponent : public Component {
         isFalling = falling;
     }
 
-    glm::mat4 getGLMTransform() const {
+    glm::mat4 getGLMTransform() {
         float transformArr[16];
+
+        transform = body->getTransform();
+
+        transform.getOpenGLMatrix(transformArr);
 
         return glm::mat4({
                                  {transformArr[0],  transformArr[1],  transformArr[2],  transformArr[3]},
