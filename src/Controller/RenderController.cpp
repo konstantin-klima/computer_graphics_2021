@@ -117,7 +117,6 @@ void RenderController::drawOtherPlayer(Entity *player) {
 void RenderController::drawEntities() {
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
     auto entities = EntityManager::getManager().getEntitiesWithComponent<ModelComponent>();
-
     for (const auto player : players) {
 
         auto cameraComponent = player->getComponent<CameraComponent>();

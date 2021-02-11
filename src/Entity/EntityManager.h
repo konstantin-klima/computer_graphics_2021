@@ -50,6 +50,14 @@ struct EntityManager {
         return res;
     }
 
+    void removeEntity(unsigned id){
+        auto it = find_if(m_entities.begin(), m_entities.end(), [&](std::unique_ptr<Entity>& e){ return e->getID() == id; });
+
+        if (it != m_entities.end()) {
+            m_entities.erase(it);
+        }
+    }
+
     void clearEntities(){
         m_entities.clear();
     }
