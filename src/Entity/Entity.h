@@ -48,6 +48,11 @@ public:
 
         return *(static_cast<TComp*>(m_Comps.back().get()));
     }
+
+    [[nodiscard]]
+    unsigned getID() const {
+        return m_ID;
+    }
 };
 
 
