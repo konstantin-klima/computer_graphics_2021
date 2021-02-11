@@ -86,6 +86,34 @@ void RenderController::clearGlBuffers() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void RenderController::drawOtherPlayer(Entity *player) {
+    auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
+
+    Entity *other = nullptr;
+    if (player == players[0])
+        other = players[1];
+    else
+        other = players[0];
+
+
+    auto playerShader = other->getComponent<ShaderComponent>()->getShader();
+    auto playerTransform = other->getComponent<CollisionBodyComponent>()->getGLMTransform();
+    playerTransform = glm::translate(playerTransform, glm::vec3(0, 0.5, 0));
+    playerShader->use();
+    glm::mat4 projection = glm::perspective(glm::radians(player->getComponent<CameraComponent>()->camera.Zoom),
+                                            (float) Settings::SCR_WIDTH / (float) Settings::SCR_HEIGHT,
+                                            0.1f, 100.0f);
+    glm::mat4 view = player->getComponent<CameraComponent>()->getViewMatrix();
+
+    playerShader->setMat4("model", playerTransform);
+    playerShader->setMat4("projection", projection);
+    playerShader->setMat4("view", view);
+
+    auto playerModel = other->getComponent<PlayerModelComponent>();
+
+    playerModel->draw();
+}
+
 void RenderController::drawEntities() {
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
     auto entities = EntityManager::getManager().getEntitiesWithComponent<ModelComponent>();
@@ -98,40 +126,15 @@ void RenderController::drawEntities() {
         glViewport(cameraComponent->camIndex * Settings::SCR_WIDTH * 0.5, 0, Settings::SCR_WIDTH * 0.5,
                    Settings::SCR_HEIGHT);
 
-        // Draw player
-        auto playerShader = player->getComponent<ShaderComponent>()->getShader();
-        auto playerTransform = player->getComponent<CollisionBodyComponent>()->getGLMTransform();
-        playerShader->use();
-        glm::mat4 projection = glm::perspective(glm::radians(cameraComponent->camera.Zoom),
-                                                (float) Settings::SCR_WIDTH / (float) Settings::SCR_HEIGHT,
-                                                0.1f, 100.0f);
-        glm::mat4 view = cameraComponent->getViewMatrix();
+        drawOtherPlayer(player);
 
-        playerShader->setMat4("model", playerTransform);
-        playerShader->setMat4("projection", projection);
-        playerShader->setMat4("view", view);
-
-        auto playerModel = player->getComponent<PlayerModelComponent>();
-
-        std::cout << playerModel->getModel()->toString() << std::endl;
-
-        playerModel->draw();
-
-//        for (int i = 0; i < playerTransform.length(); i++) {
-//            for (int j = 0; j < playerTransform[i].length(); j++) {
-//                std::cout << playerTransform[i][j] << " ";
-//            }
-//
-//            std::cout << std::endl;
-//        }
-//
-//        std::cout << "SHADER: " << playerShader->ID << std::endl;
 
         for (auto entity : entities) {
 
-            if (entity == player) {
+            if (entity == players[0] || entity == players[1]) {
                 continue;
             }
+
             auto shaderComponent = entity->getComponent<ShaderComponent>();
             auto model = entity->getComponent<ModelComponent>()->getModel();
             Component *body = nullptr;

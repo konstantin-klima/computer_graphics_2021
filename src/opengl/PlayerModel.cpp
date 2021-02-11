@@ -3,6 +3,9 @@
 //
 
 #include "PlayerModel.h"
+#include "learnopengl/shader.h"
+#include "rg/Texture2D.h"
+#include <glm/glm.hpp>
 
 PlayerModel::PlayerModel() {
     glGenVertexArrays(1, &VAO);
@@ -29,11 +32,6 @@ PlayerModel::PlayerModel() {
 }
 
 void PlayerModel::draw() {
-    scale = 10.0f;
-    for (int i = 0; i < 48; i++) {
-        cube[i] *= scale;
-    }
-
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

@@ -76,7 +76,7 @@ void SpellFactory::makeMovementComponent() {
                 direction.x,
                 direction.y,
                 direction.z,
-                0
+                75
                 );
         m_spellEntity->addComponent<MovementComponent>(mc);
     }

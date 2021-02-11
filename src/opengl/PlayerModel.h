@@ -28,7 +28,7 @@ private:
     unsigned int VAO, VBO, EBO;
 
     float cube[48] = {
-            // POSITIONS-------NORMALS------------
+            // POSITIONS-------NORMALS-------------TEXTURE 1
             -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f,
             1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f,
             1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
@@ -39,7 +39,7 @@ private:
             -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
     };
 
-    float indices[36] = {
+    unsigned int indices[36] = {
             0, 1, 2, 2, 3, 0,
             3, 2, 6, 6, 7, 3,
             7, 6, 5, 5, 4, 7,
