@@ -9,6 +9,8 @@
 #include "../Entity/ModelManager.h"
 #include "../Entity/ShaderManager.h"
 #include "PhysicsController.h"
+#include <string>
+#include <sstream>
 
 SpellFactory::SpellFactory(Entity *player, SPELL spell)
     : m_player(player)
@@ -16,6 +18,7 @@ SpellFactory::SpellFactory(Entity *player, SPELL spell)
     {
         m_spellEntity = new Entity();
         m_camera = &player->getComponent<CameraComponent>()->camera;
+        ID++;
     }
 
 Entity *SpellFactory::makeSpell() {
@@ -116,12 +119,26 @@ void SpellFactory::makeRigidBodyComponent() {
     auto linearVelocity = m_spellEntity->getComponent<MovementComponent>()->getDirection() * m_spellEntity->getComponent<MovementComponent>()->getSpeed();
     body.getRigidBody()->setLinearVelocity(linearVelocity);
     body.addCollider(m_spellEntity->getComponent<SphereColliderComponent>()->getShape());
+    // Allow the spell to only collide with the arena and the enemy player
+    body.getRigidBody()->getCollider(0)->setCollisionCategoryBits(Settings::CollisionCategory::SPELL);
+    Settings::CollisionCategory enemyCategory;
+    if (m_player->getComponent<CollisionBodyComponent>()->getBody()->getCollider(0)->getCollisionCategoryBits() & Settings::CollisionCategory::PLAYER1)
+        enemyCategory = Settings::CollisionCategory::PLAYER2;
+    else
+        enemyCategory == Settings::CollisionCategory::PLAYER1;
+    body.getRigidBody()->getCollider(0)->setCollideWithMaskBits(enemyCategory);
+    // Name the spell
+    std::stringstream nameStream;
+    nameStream << "SPELL" << ID;
+    std::string *name = new std::string(nameStream.str());
+//    std::cout << *name << std::endl;
+    body.getRigidBody()->setUserData((void *)&"SPELL");
     m_spellEntity->addComponent<RigidBodyComponent>(body);
 
 }
 
 void SpellFactory::makeSpellPropertyComponent() {
     // This is just a placeholder right now
-    auto sp = SpellPropertyComponent(100, 100, SPELL_TYPES::BULLET);
+    auto sp = SpellPropertyComponent(1001, 100, SPELL_TYPES::BULLET);
     m_spellEntity->addComponent<SpellPropertyComponent>(sp);
 }

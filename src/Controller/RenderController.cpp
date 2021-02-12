@@ -111,7 +111,7 @@ void RenderController::drawOtherPlayer(Entity *player) {
 
     auto playerModel = other->getComponent<PlayerModelComponent>();
 
-    playerModel->draw();
+    playerModel->draw(playerShader);
 }
 
 void RenderController::drawEntities() {

@@ -32,6 +32,7 @@ class SpellFactory {
 public:
     SpellFactory(Entity* player, SPELL spell);
     Entity* makeSpell();
+    inline static unsigned int ID = 0;
 };
 
 

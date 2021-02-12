@@ -3,9 +3,7 @@
 //
 
 #include "PlayerModel.h"
-#include "learnopengl/shader.h"
 #include "rg/Texture2D.h"
-#include <glm/glm.hpp>
 
 PlayerModel::PlayerModel() {
     glGenVertexArrays(1, &VAO);
@@ -31,9 +29,18 @@ PlayerModel::PlayerModel() {
 //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void PlayerModel::draw() {
+void PlayerModel::draw(Shader *shader) {
+    shader->setVec4("playerColor", activeColor);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void PlayerModel::setAlive(bool alive) {
+    if (alive)
+        activeColor = aliveColor;
+    else
+        activeColor = deadColor;
+
 }

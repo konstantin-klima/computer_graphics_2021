@@ -17,7 +17,7 @@ class EventListener : public rp3d::EventListener {
 
             auto b1 = contactPair.getBody1();
             auto b2 = contactPair.getBody2();
-            auto c1 = contactPair.getCollider2();
+            auto c1 = contactPair.getCollider1();
             auto c2 = contactPair.getCollider2();
 
 
@@ -65,6 +65,49 @@ class EventListener : public rp3d::EventListener {
 
                     pBody->setTransform(rp3d::Transform(pos, ori));
                 }
+            } else if ((c1->getCollisionCategoryBits() & Settings::CollisionCategory::SPELL ||
+                        c1->getCollisionCategoryBits() & Settings::CollisionCategory::PLAYER) &&
+                       (c2->getCollisionCategoryBits() & Settings::CollisionCategory::PLAYER ||
+                        c2->getCollisionCategoryBits() & Settings::CollisionCategory::SPELL)) {
+
+
+                rp3d::CollisionBody *pBody, *sBody;
+
+                if (c1->getCollisionCategoryBits() & Settings::CollisionCategory::SPELL) {
+                    sBody = b1;
+                    pBody = b2;
+                } else {
+                    sBody = b2;
+                    pBody = b1;
+                }
+
+                auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
+                auto res = std::find_if(players.begin(), players.end(), [pBody](Entity *e) {
+                    return
+                    e->getComponent<CollisionBodyComponent>()->getBody() == pBody;
+                });
+                auto player = *res;
+
+                auto spells = EntityManager::getManager().getEntitiesWithComponent<SpellPropertyComponent>();
+                res = std::find_if(spells.begin(), spells.end(), [sBody](Entity *e) {
+                    return e->getComponent<RigidBodyComponent>()->getRigidBody() == sBody;
+                });
+                auto spell = *res;
+
+                auto eventType = contactPair.getEventType();
+                if (eventType == rp3d::CollisionCallback::ContactPair::EventType::ContactStart) {
+                    auto hp = player->getComponent<HealthComponent>();
+                    auto sp = spell->getComponent<SpellPropertyComponent>();
+                    hp->setHealth(hp->getCurrentHealth() - sp->getDamage());
+
+//                    EntityManager::getManager().removeEntity(spell->getID());
+
+                    if (hp->getCurrentHealth() < 0) {
+                        player->getComponent<PlayerModelComponent>()->setAlive(false);
+                    }
+                }
+
+
             }
         }
     }

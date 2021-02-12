@@ -15,28 +15,31 @@ void PlayerController::init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWor
     }
 
     auto player1 = new Entity();
-    player1->addComponent<CameraComponent>(10, 10, 0, 0);
+    player1->addComponent<CameraComponent>(10, 20, 0, 0);
     player1->addComponent<MovementComponent>(0, 0, 0, 15.0f);
-    player1->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
+    player1->addComponent<CapsuleColliderComponent>(0.5, 1.0, physicsCommon);
     player1->addComponent<CollisionBodyComponent>(10, 10, 0, world);
     player1->addComponent<PlayerModelComponent>();
     player1->addComponent<ShaderComponent>(ShaderManager::getManager().getShader("player"));
+    player1->addComponent<HealthComponent>(1000);
     auto p1Body = player1->getComponent<CollisionBodyComponent>();
     p1Body->getBody()->setUserData((void *) &"PLAYER1");
     p1Body->addCollider(player1->getComponent<CapsuleColliderComponent>()->getShape());
+    p1Body->getBody()->getCollider(0)->setCollisionCategoryBits(Settings::CollisionCategory::PLAYER1 | Settings::CollisionCategory::PLAYER);
     EntityManager::getManager().addEntity(player1);
 
     auto player2 = new Entity();
-    player2->addComponent<CameraComponent>(-10, 10, -10, 1);
+    player2->addComponent<CameraComponent>(-10, 20, -10, 1);
     player2->addComponent<MovementComponent>(0, 0, 0, 15.0f);
-    player2->addComponent<CapsuleColliderComponent>(0.3, 1.0, physicsCommon);
+    player2->addComponent<CapsuleColliderComponent>(0.5, 1.01, physicsCommon);
     player2->addComponent<CollisionBodyComponent>(-10, 10, -10, world);
     player2->addComponent<PlayerModelComponent>();
     player2->addComponent<ShaderComponent>(ShaderManager::getManager().getShader("player"));
+    player2->addComponent<HealthComponent>(1000);
     auto p2Body = player2->getComponent<CollisionBodyComponent>();
     p2Body->getBody()->setUserData((void *) &"PLAYER2");
     p2Body->addCollider(player2->getComponent<CapsuleColliderComponent>()->getShape());
-
+    p2Body->getBody()->getCollider(0)->setCollisionCategoryBits(Settings::CollisionCategory::PLAYER2 | Settings::CollisionCategory::PLAYER);
     EntityManager::getManager().addEntity(player2);
 
     initialized = true;
@@ -46,6 +49,9 @@ void PlayerController::update() {
     auto players = EntityManager::getManager().getEntitiesWithComponent<CameraComponent>();
 
     for (auto player : players) {
+        // Cant move if u ded
+        if (player->getComponent<HealthComponent>()->getCurrentHealth() <= 0)
+            continue;
         auto body = player->getComponent<CollisionBodyComponent>();
         player->getComponent<MovementComponent>()->moveCollisionBody(body, PhysicsController::getDeltaTime());
         auto newPos = body->getPosition();

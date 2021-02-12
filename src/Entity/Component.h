@@ -155,8 +155,12 @@ struct PlayerModelComponent : public Component {
         return model;
     }
 
-    void draw() {
-        model->draw();
+    void draw(Shader *shader) {
+        model->draw(shader);
+    }
+
+    void setAlive(bool alive) {
+        model->setAlive(alive);
     }
 private:
     PlayerModel *model;
@@ -444,6 +448,26 @@ private:
     float damage;
     float range;
     SPELL_TYPES type;
+};
+
+struct HealthComponent : public Component {
+    HealthComponent(float maxHealth) {
+        // If negative, unit is immortal (you cannot kill that which has no life)
+        this->maxHealth = maxHealth;
+        currentHealth = maxHealth;
+    }
+
+    void setHealth(float newHealth) {
+        currentHealth = newHealth;
+    }
+
+    float getCurrentHealth() const {
+        return currentHealth;
+    }
+
+private:
+    float maxHealth;
+    float currentHealth;
 };
 
 // Colliders
