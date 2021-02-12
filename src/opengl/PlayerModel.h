@@ -15,12 +15,6 @@ public:
 
     void draw();
 
-    std::string toString() {
-        std::stringstream ss;
-        ss << "VBO " << VBO << ", EBO: " << EBO << ", VAO: " << VAO << std::endl;
-
-        return ss.str();
-    }
 
 private:
     float scale = 1;

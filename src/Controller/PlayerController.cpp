@@ -84,6 +84,12 @@ void PlayerController::processInput(GLFWwindow *window) {
             if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
                 direction += rp3d::Vector3(0, -1, 0);
 
+            auto p1_currentKeyState_f = glfwGetKey(window, GLFW_KEY_F);
+            if (p1_currentKeyState_f == GLFW_RELEASE && p1_lastKeyState_f == GLFW_PRESS) {
+                switchFlashlight(player);
+            }
+            p1_lastKeyState_f = p1_currentKeyState_f;
+
             auto p1_currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
             if (p1_currentKeyState_1 == GLFW_RELEASE && p1_lastKeyState_1 == GLFW_PRESS)
                 castSpell(player, SPELL::FROST_BOMB);
@@ -136,5 +142,27 @@ void PlayerController::castSpell(Entity *player, SPELL spell) {
 
     // Make an Entity. It's inside EntityManager, the pointer is here for any additional changes
     auto spellEntity = SpellFactory(player, spell).makeSpell();
-    std::cout << EntityManager::getManager().getAllComponents<LightComponent>().size() << std::endl;
+}
+
+void PlayerController::switchFlashlight(Entity *player){
+    if(!player->hasComponent<LightComponent>()){
+        auto camera = player->getComponent<CameraComponent>()->camera;
+        auto lc = LightComponent(
+                std::forward<glm::vec3>(camera.Position),
+                std::forward<glm::vec3>(camera.Front),
+                glm::vec3(1.f, 1.0f, 0.f),
+                glm::vec3(0, 1.f, 0.f),
+                glm::vec3(0, 1.f, 0.f),
+                glm::cos(glm::radians(12.5f)),
+                glm::cos(glm::radians(15.0f)),
+                1.0f,
+                0.09f,
+                0.032f
+        );
+        player->addComponent<LightComponent>(lc);
+    }
+    else{
+        player->removeComponent<LightComponent>();
+    }
+
 }

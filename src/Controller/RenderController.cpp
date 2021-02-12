@@ -57,7 +57,19 @@ void RenderController::updateLights() {
 
                 pointLightNo++;
             } else if (light->type == LIGHTS::SPOTLIGHT) {
+                std::ostringstream stream;
+                stream << "spotLights[" << spotlightNo << "].";
+                std::string prefix = stream.str();
 
+                shader->setVec3(prefix + "position", light->position);
+                shader->setVec3(prefix + "direction", light->direction);
+                shader->setVec3(prefix + "ambient", light->ambient);
+                shader->setVec3(prefix + "diffuse", light->diffuse);
+                shader->setVec3(prefix + "specular", light->specular);
+                shader->setFloat(prefix + "cutOff", light->cutOff);
+                shader->setFloat(prefix + "quadratic", light->cutOffOuter);
+
+                spotlightNo++;
             } else if (light->type == LIGHTS::DIRECT) {
                 shader->setVec3("directLight.direction", light->direction);
                 shader->setVec3("directLight.ambient", light->ambient);
@@ -67,6 +79,7 @@ void RenderController::updateLights() {
         }
 
         shader->setInt("pointLightNo", pointLightNo);
+        shader->setInt("spotLightNo", spotlightNo);
     }
 
 }
@@ -111,8 +124,6 @@ void RenderController::drawEntities() {
         playerShader->setMat4("view", view);
 
         auto playerModel = player->getComponent<PlayerModelComponent>();
-
-        std::cout << playerModel->getModel()->toString() << std::endl;
 
         playerModel->draw();
 

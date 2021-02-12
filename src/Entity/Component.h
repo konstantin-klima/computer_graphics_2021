@@ -71,9 +71,18 @@ struct LightComponent : public Component {
     };
 
     LightComponent(glm::vec3 &&direction, glm::vec3 &&ambient, glm::vec3 &&diffuse, glm::vec3 &&specular)
-            : direction(direction), ambient(ambient), diffuse(diffuse), specular(specular) {
+            : ambient(ambient), diffuse(diffuse), specular(specular), direction(direction) {
         type = DIRECT;
-    }
+    };
+
+    LightComponent(glm::vec3 &&position, glm::vec3 &&direction, glm::vec3 &&ambient, glm::vec3 &&diffuse, glm::vec3 &&specular,
+                   float cutOff, float cutOffOuter, float constant, float linear, float quadratic)
+            : position(position), ambient(ambient), diffuse(diffuse), specular(specular), constant(constant),
+              linear(linear), quadratic(quadratic), direction(direction),
+              cutOff(cutOff), cutOffOuter(cutOffOuter) {
+        type = SPOTLIGHT;
+    };
+
 };
 
 struct CameraComponent : public Component {

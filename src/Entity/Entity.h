@@ -49,6 +49,19 @@ public:
         return *(static_cast<TComp*>(m_Comps.back().get()));
     }
 
+    template<typename T>
+    void removeComponent() {
+        if(m_Comps.size() == 0)
+            return;
+
+        auto id = Component::GetComponentTypeID<T>();
+        auto res = std::find_if(m_Comps.begin(), m_Comps.end(), [id](std::unique_ptr<Component>& c){return c->m_TypeId == id;});
+
+        if(res != m_Comps.end()){
+            m_Comps.erase(res);
+        }
+    };
+
     [[nodiscard]]
     unsigned getID() const {
         return m_ID;

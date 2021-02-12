@@ -33,6 +33,10 @@ struct SpotLight {
 
     float cutOff;
     float cutOffOuter;
+
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 struct Material {
@@ -44,7 +48,7 @@ struct Material {
 
 uniform DirectLight directLight;
 uniform PointLight pointLights[MAX_LIGHTS];
-uniform SpotLight spotLights[MAX_LIGHTS];
+uniform SpotLight spotLights[8];
 uniform Material material;
 uniform vec3 viewPosition;
 
@@ -97,12 +101,48 @@ vec3 calculatePointLightsWeight(vec3 normal, vec3 viewDirection, vec3 fragPos) {
     return result;
 }
 
+
+vec3 calculateSpotLightSingle(SpotLight sl, vec3 normal, vec3 viewDirection, vec3 fragPos) {
+    vec3 lightDir = normalize(sl.position - fragPos);
+
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 halfwayDir = normalize(lightDir + viewDirection);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+
+    float distance = length(sl.position - fragPos);
+    float attenuation = 1.0 / (sl.constant + sl.linear * distance + sl.quadratic * (distance * distance));
+
+    vec3 ambient  = sl.ambient  * vec3(texture(material.texture_diffuse1, TexCoords));
+    vec3 diffuse  = sl.diffuse  * diff * vec3(texture(material.texture_diffuse1, TexCoords));
+    vec3 specular = sl.specular * spec * vec3(texture(material.texture_specular1, TexCoords));
+
+    float theta = dot(lightDir, normalize(-sl.direction));
+    float eps = sl.cutOff - sl.cutOffOuter;
+    float intensity = clamp((theta - sl.cutOffOuter) / eps, 0.0, 1.0);
+
+    ambient  *= attenuation * intensity;
+    diffuse  *= attenuation * intensity;
+    specular *= attenuation * intensity;
+
+    return (ambient + diffuse + specular);
+}
+
+vec3 calculateSpotlightWeight(vec3 normal, vec3 viewDirection, vec3 fragPos) {
+    vec3 result = vec3(0.0, 0.0, 0.0);
+    for(int i = 0; i < spotLightNo; i++){
+        result += calculateSpotLightSingle(spotLights[i], normal, viewDirection, fragPos);
+    }
+
+    return result;
+}
+
 void main() {
     vec3 normal = normalize(Normal);
     vec3 viewDirection = normalize(viewPosition - FragPos);
     vec3 dirWeight = calculateDirectLightWeight(normal, viewDirection);
     vec3 plWeight = calculatePointLightsWeight(normal, viewDirection, FragPos);
+    vec3 slWeight = calculateSpotlightWeight(normal, viewDirection, FragPos);
 
-    vec3 result = dirWeight + plWeight;
+    vec3 result = dirWeight + plWeight + slWeight;
     FragColor = vec4(result, 1.0);
 }
