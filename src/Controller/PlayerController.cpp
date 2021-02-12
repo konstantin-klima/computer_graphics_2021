@@ -100,6 +100,8 @@ void PlayerController::processInput(GLFWwindow *window) {
             direction.normalize();
             auto movement = player->getComponent<MovementComponent>();
             movement->setDirection(&direction);
+
+            updateFlashlightPosition(player);
         } else {
             auto direction = rp3d::Vector3(0, 0, 0);
 
@@ -119,6 +121,16 @@ void PlayerController::processInput(GLFWwindow *window) {
     }
 }
 
+void PlayerController::updateFlashlightPosition(Entity* player){
+    if(player->hasComponent<LightComponent>()){
+        auto camera = player->getComponent<CameraComponent>()->camera;
+        auto light = player->getComponent<LightComponent>();
+
+        light->position = camera.Position;
+        light->direction = camera.Front;
+    }
+}
+
 void PlayerController::processMouse(float xoffset, float yoffset) {
     float MouseSensitivity = 1.0;
 
@@ -129,6 +141,7 @@ void PlayerController::processMouse(float xoffset, float yoffset) {
         auto camera = player->getComponent<CameraComponent>();
         if (camera->camIndex == 0) {
             camera->updateCameraVectors(xoffset, yoffset);
+            updateFlashlightPosition(player);
         }
     }
 

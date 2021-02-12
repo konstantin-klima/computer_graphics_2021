@@ -32,6 +32,7 @@ struct PlayerController {
 private:
     static void castSpell(Entity* player, SPELL spell);
     static void switchFlashlight(Entity *player);
+    static void updateFlashlightPosition(Entity *player);
 
     inline static unsigned p1_lastKeyState_1 = 0;
     inline static unsigned p1_lastKeyState_2 = 0;
