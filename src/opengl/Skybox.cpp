@@ -44,7 +44,6 @@ void Skybox::loadSkybox(const std::string &skyboxDirectory){
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     texture = textureID;
-    std::cout << textureID << std::endl;
 }
 
 void Skybox::prepareBuffers() {
