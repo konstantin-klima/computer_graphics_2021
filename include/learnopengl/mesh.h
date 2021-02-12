@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef MESH_H
 #define MESH_H
 
@@ -39,15 +41,17 @@ public:
     vector<Vertex>       vertices;
     vector<unsigned int> indices;
     vector<Texture>      textures;
+    unsigned int numFaces;
 
     unsigned int VAO;
     std::string glslIdentifierPrefix;
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, const unsigned int faceNum)
     {
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
+        this->numFaces = faceNum;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();

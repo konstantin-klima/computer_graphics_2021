@@ -29,12 +29,14 @@ public:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
+    unsigned int numFaces
 
     Mesh(const std::vector<Vertex>& vs, const std::vector<unsigned int>& ind,
-         const std::vector<Texture>& tex)
+         const std::vector<Texture>& tex, const unsigned int faceNum)
          : vertices(vs)
          , indices(ind)
-         , textures(tex) {
+         , textures(tex)
+         , numFaces(faceNum){
         setupMesh();
     }
 

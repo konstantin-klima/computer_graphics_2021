@@ -11,7 +11,7 @@ function(watch)
 endfunction()
 
 set(CMAKE_POLICY_DEFAULT_CMP0012 NEW)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-variable -Wno-unused-parameter -O3")
 
@@ -24,6 +24,8 @@ find_package(ASSIMP REQUIRED)
 
 add_subdirectory(libs/glad)
 add_subdirectory(libs/imgui)
+add_subdirectory(libs/reactphysics3d)
+add_subdirectory(tests)
 
 add_definitions(${OPENGL_DEFINITIONS})
 
@@ -33,7 +35,7 @@ set_source_files_properties(libs/stb_image.cpp include/stb_image.h
         COMPILE_FLAGS
         "-Wno-shift-negative-value -Wno-implicit-fallthrough")
 
-set(LIBS glfw glad OpenGL::GL X11 Xrandr Xinerama Xi Xxf86vm Xcursor dl pthread freetype ${ASSIMP_LIBRARIES} STB_IMAGE imgui)
+set(LIBS glfw glad OpenGL::GL X11 Xrandr Xinerama Xi Xxf86vm Xcursor dl pthread freetype ${ASSIMP_LIBRARIES} STB_IMAGE imgui reactphysics3d)
 
 
 configure_file(configuration/root_directory.h.in configuration/root_directory.h)
@@ -42,7 +44,8 @@ include_directories(${CMAKE_BINARY_DIR}/configuration)
 
 include_directories(include/)
 add_executable(${PROJECT_NAME}
-        ${SOURCES})
+
+        ${SOURCES} include/ConcaveCollider.h src/Entity/Entity.cpp src/Entity/Entity.h src/Entity/Component.h src/Entity/EntityManager.cpp src/Entity/EntityManager.h src/Controller/PlayerController.cpp src/Controller/PlayerController.h src/Controller/RenderController.cpp src/Controller/RenderController.h src/Entity/ShaderManager.h src/constants.h include/common.cpp include/learnopengl/model.cpp include/learnopengl/model.h src/Controller/PhysicsController.h src/Controller/PhysicsController.cpp src/Controller/LevelController.cpp src/Controller/LevelController.h src/opengl/Skybox.cpp src/opengl/Skybox.h src/Controller/SpellFactory.cpp src/Controller/SpellFactory.h include/EventListener.h src/opengl/PlayerModel.h src/opengl/PlayerModel.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
