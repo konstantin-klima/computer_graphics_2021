@@ -60,9 +60,9 @@ void RenderController::updateLights() {
 
             } else if (light->type == LIGHTS::DIRECT) {
                 shader->setVec3("directLight.direction", light->direction);
-                shader->setVec3("directLight.ambient", light->direction);
-                shader->setVec3("directLight.diffuse", light->direction);
-                shader->setVec3("directLight.specular", light->direction);
+                shader->setVec3("directLight.ambient", light->ambient);
+                shader->setVec3("directLight.diffuse", light->diffuse);
+                shader->setVec3("directLight.specular", light->specular);
             }
         }
 
