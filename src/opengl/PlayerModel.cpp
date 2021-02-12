@@ -3,6 +3,7 @@
 //
 
 #include "PlayerModel.h"
+#include "rg/Texture2D.h"
 
 PlayerModel::PlayerModel() {
     glGenVertexArrays(1, &VAO);
@@ -28,14 +29,18 @@ PlayerModel::PlayerModel() {
 //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void PlayerModel::draw() {
-    scale = 10.0f;
-    for (int i = 0; i < 48; i++) {
-        cube[i] *= scale;
-    }
-
+void PlayerModel::draw(Shader *shader) {
+    shader->setVec4("playerColor", activeColor);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void PlayerModel::setAlive(bool alive) {
+    if (alive)
+        activeColor = aliveColor;
+    else
+        activeColor = deadColor;
+
 }
