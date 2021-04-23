@@ -9,37 +9,28 @@
 #include "EventListener.h"
 #include <chrono>
 
-
 struct PhysicsController {
-    static void init();
+	static void init();
 
-    static void update();
+	static void update();
 
+	static rp3d::PhysicsCommon* getPhysicsCommon() { return physicsCommon; }
 
+	static rp3d::PhysicsWorld* getWorld() { return world; }
 
-    static rp3d::PhysicsCommon *getPhysicsCommon() {
-        return physicsCommon;
-    }
+	static double getDeltaTime() { return deltaTime.count(); }
 
-    static rp3d::PhysicsWorld *getWorld() {
-        return world;
-    }
-
-    static double getDeltaTime() {
-        return deltaTime.count();
-    }
-
-private:
-    inline static bool initialized = false;
-    // zasto mora inline???
-    inline static const float timeStep = 1 / 60.0f;
-    inline static rp3d::PhysicsCommon *physicsCommon;
-    inline static rp3d::PhysicsWorld *world;
-    inline static std::chrono::system_clock::time_point previousTime;
-    inline static std::chrono::system_clock::time_point currentTime;
-    inline static long double accumulator;
-    inline static std::chrono::duration<double> deltaTime;
-    inline static EventListener *eventListener;
+  private:
+	inline static bool initialized = false;
+	// zasto mora inline???
+	inline static const float timeStep = 1 / 60.0f;
+	inline static rp3d::PhysicsCommon* physicsCommon;
+	inline static rp3d::PhysicsWorld* world;
+	inline static std::chrono::system_clock::time_point previousTime;
+	inline static std::chrono::system_clock::time_point currentTime;
+	inline static long double accumulator;
+	inline static std::chrono::duration<double> deltaTime;
+	inline static EventListener* eventListener;
 };
 
-#endif //PROJECT_BASE_PHYSICSCONTROLLER_H
+#endif // PROJECT_BASE_PHYSICSCONTROLLER_H

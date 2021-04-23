@@ -10,23 +10,23 @@
 #include "../Entity/EntityManager.h"
 #include "../constants.h"
 
-class RenderController {
+class RenderController
+{
 
+  public:
+	static void init();
+	static void render();
 
-public:
-    static void init();
-    static void render();
+	static void loadShaders();
+	static void updateLights();
+	static void drawEntities();
 
-    static void loadShaders();
-    static void updateLights();
-    static void drawEntities();
+	static void clearGlBuffers();
 
-    static void clearGlBuffers();
+	static void drawOtherPlayer(Entity* player);
 
-    static void drawOtherPlayer(Entity *player);
-private:
-    static void updateShaderView(Camera c);
+  private:
+	static void updateShaderView(Camera c);
 };
 
-
-#endif //PROJECT_BASE_RENDERCONTROLLER_H
+#endif // PROJECT_BASE_RENDERCONTROLLER_H

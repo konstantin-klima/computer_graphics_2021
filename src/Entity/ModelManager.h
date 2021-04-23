@@ -10,50 +10,50 @@
 #include <memory>
 #include "../include/learnopengl/model.h"
 
-
 struct ModelManager {
 
-    static ModelManager& getManager(){
-        static ModelManager instance;
-        return instance;
-    }
+	static ModelManager& getManager()
+	{
+		static ModelManager instance;
+		return instance;
+	}
 
-    ModelManager(ModelManager const&) = delete;
-    void operator=(ModelManager const&) = delete;
+	ModelManager(ModelManager const&) = delete;
+	void operator=(ModelManager const&) = delete;
 
-    void addModel(const std::string& name, Model* s)
-    {
-        m_models[name] = std::make_unique<Model>(*s);
-    }
-    void addModel(const std::string& name, std::unique_ptr<Model>&& s)
-    {
-        m_models[name] = (std::move(s));
-    }
+	void addModel(const std::string& name, Model* s)
+	{
+		m_models[name] = std::make_unique<Model>(*s);
+	}
+	void addModel(const std::string& name, std::unique_ptr<Model>&& s)
+	{
+		m_models[name] = (std::move(s));
+	}
 
-    void clearModels(){
-        m_models.clear();
-    }
+	void clearModels() { m_models.clear(); }
 
-    Model* getModel(const std::string& name) const {
-        for(const auto& it : m_models){
-            if(it.first == name)
-                return it.second.get();
-        }
+	Model* getModel(const std::string& name) const
+	{
+		for (const auto& it : m_models) {
+			if (it.first == name)
+				return it.second.get();
+		}
 
-        return nullptr;
-    }
+		return nullptr;
+	}
 
-    std::vector<Model*> getAllModels() const {
-        std::vector<Model*> res;
-        for(const auto& it : m_models){
-            res.push_back(it.second.get());
-        }
+	std::vector<Model*> getAllModels() const
+	{
+		std::vector<Model*> res;
+		for (const auto& it : m_models) {
+			res.push_back(it.second.get());
+		}
 
-        return res;
-    }
+		return res;
+	}
 
-private:
-    std::unordered_map<std::string, std::unique_ptr<Model>> m_models {};
-    ModelManager() = default;
+  private:
+	std::unordered_map<std::string, std::unique_ptr<Model>> m_models {};
+	ModelManager() = default;
 };
-#endif //PROJECT_BASE_MODELMANAGER_H
+#endif // PROJECT_BASE_MODELMANAGER_H

@@ -5,13 +5,12 @@
 #ifndef PROJECT_BASE_LEVELCONTROLLER_H
 #define PROJECT_BASE_LEVELCONTROLLER_H
 
-
 #include "reactphysics3d/reactphysics3d.h"
 
 struct LevelController {
-    static void init(rp3d::PhysicsCommon *physicsCommon, rp3d::PhysicsWorld *world);
-    static void update();
+	static void init(rp3d::PhysicsCommon* physicsCommon,
+					 rp3d::PhysicsWorld* world);
+	static void update();
 };
 
-
-#endif //PROJECT_BASE_LEVELCONTROLLER_H
+#endif // PROJECT_BASE_LEVELCONTROLLER_H

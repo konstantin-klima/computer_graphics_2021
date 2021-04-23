@@ -10,41 +10,41 @@
 
 #include <iostream>
 
-void PhysicsController::init() {
-    if (initialized) {
-        return;
-    }
+void PhysicsController::init()
+{
+	if (initialized) {
+		return;
+	}
 
-    physicsCommon = new rp3d::PhysicsCommon;
-    world = physicsCommon->createPhysicsWorld();
-    previousTime = std::chrono::system_clock::now();
-    currentTime = std::chrono::system_clock::now();
-    accumulator = 0;
+	physicsCommon = new rp3d::PhysicsCommon;
+	world = physicsCommon->createPhysicsWorld();
+	previousTime = std::chrono::system_clock::now();
+	currentTime = std::chrono::system_clock::now();
+	accumulator = 0;
 
-    eventListener = new EventListener();
+	eventListener = new EventListener();
 
-    world->setEventListener(eventListener);
+	world->setEventListener(eventListener);
 
-    deltaTime = currentTime - previousTime;
+	deltaTime = currentTime - previousTime;
 
-    initialized = true;
+	initialized = true;
 }
 
-void PhysicsController::update() {
-    currentTime = std::chrono::system_clock::now();
-    deltaTime = currentTime - previousTime;
-    previousTime = currentTime;
+void PhysicsController::update()
+{
+	currentTime = std::chrono::system_clock::now();
+	deltaTime = currentTime - previousTime;
+	previousTime = currentTime;
 
-    accumulator += deltaTime.count();
+	accumulator += deltaTime.count();
 
-    while (accumulator >= timeStep) {
-        world->update(timeStep);
-        accumulator -= timeStep;
-    }
+	while (accumulator >= timeStep) {
+		world->update(timeStep);
+		accumulator -= timeStep;
+	}
 
-    // TODO: add interpolation
+	// TODO: add interpolation
 
-//    float factor = accumulator / timeStep;
-
-
+	//    float factor = accumulator / timeStep;
 }

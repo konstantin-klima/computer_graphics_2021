@@ -5,9 +5,8 @@
 //
 
 #ifndef PROJECT_BASE_COMMON_H
-#define PROJECT_BASE_COMMON_H
+	#define PROJECT_BASE_COMMON_H
 
 std::string readFileContents(std::string path);
 
-
-#endif //PROJECT_BASE_COMMON_H
+#endif // PROJECT_BASE_COMMON_H

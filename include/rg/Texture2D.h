@@ -8,5 +8,4 @@
 #include <stb_image.h>
 #include <rg/Error.h>
 
-
-#endif //PROJECT_BASE_TEXTURE2D_H
+#endif // PROJECT_BASE_TEXTURE2D_H
