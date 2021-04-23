@@ -1,5 +1,5 @@
 # Computer Graphics 20/21.
-A project for the course Computer Graphics at the Belgrade Faculty of Mathmematics, demonstrating OpenGL features.
+A project for the course Computer Graphics at the Belgrade Faculty of Mathmematics, demonstrating OpenGL features. As the project has been graded, all further development is for personal use :)
 
 ## Project Info
 
